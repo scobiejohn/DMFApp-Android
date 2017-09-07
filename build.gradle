@@ -23,6 +23,9 @@ allprojects {
         maven{
             url "https://github.com/omadahealth/omada-nexus/raw/master/release"
         }
+        maven {
+            url "https://jitpack.io"
+        }
         jcenter()
     }
 }

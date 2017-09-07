@@ -6,8 +6,16 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/dmfTV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/hello_dmf_fragment" />
+
+    <Button
+        android:layout_marginTop="50dp"
+        android:id="@+id/openChartBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Open Chart"/>
 
 </FrameLayout>

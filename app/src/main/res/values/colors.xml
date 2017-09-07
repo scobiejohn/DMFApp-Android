@@ -18,4 +18,6 @@
     <color name="colorGreen">#14892C</color>
     <color name="colorYellow">#FFD351</color>
 
+    <color name="black_overlay">#66000000</color>
+
 </resources>

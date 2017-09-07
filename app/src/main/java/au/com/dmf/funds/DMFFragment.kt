@@ -1,11 +1,13 @@
 package au.com.dmf.funds
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
@@ -37,7 +39,15 @@ class DMFFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_dmf, container, false)
+        val view = inflater!!.inflate(R.layout.fragment_dmf, container, false)
+
+        val btn = view.findViewById<Button>(R.id.openChartBtn)
+        btn.setOnClickListener({ _ ->
+            val intent = Intent(activity, ChartActivity::class.java)
+            activity.startActivity(intent)
+        })
+
+        return view
     }
 
     // TODO: Rename method, update argument and hook method into UI event

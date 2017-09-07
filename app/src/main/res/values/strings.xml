@@ -26,4 +26,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_bright_capital_fragment">Bright Capital Fragment</string>
+
+    <string name="title_activity_chart">ChartActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

@@ -63,4 +63,7 @@ dependencies {
     compile 'com.amitshekhar.android:android-networking:1.0.0'
     //JSON parser
     compile 'com.beust:klaxon:0.30'
+
+    //MPAndroidChart
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
 }
