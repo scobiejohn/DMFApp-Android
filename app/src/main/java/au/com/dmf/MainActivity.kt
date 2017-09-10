@@ -16,8 +16,6 @@ import au.com.dmf.tasks.TasksFragment
 import com.androidnetworking.AndroidNetworking
 import kotlinx.android.synthetic.main.activity_main.*
 
-
-
 class MainActivity : AppCompatActivity(),
         FundsFragment.OnFragmentInteractionListener,
         TasksFragment.OnFragmentInteractionListener,

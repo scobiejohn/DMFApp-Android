@@ -2,6 +2,8 @@ package au.com.dmf.funds
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.DashPathEffect
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -11,6 +13,12 @@ import android.widget.Button
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import kotlinx.android.synthetic.main.fragment_dmf.*
 
 /**
  * A simple [Fragment] subclass.
@@ -25,6 +33,8 @@ class DMFFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
     private var mParam2: String? = null
+
+    private var smallChart: LineChart? = null
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -46,6 +56,15 @@ class DMFFragment : Fragment() {
             val intent = Intent(activity, ChartActivity::class.java)
             activity.startActivity(intent)
         })
+
+        smallChart = view.findViewById(R.id.smallChart)
+        smallChart!!.setOnLongClickListener({ _ ->
+            val intent = Intent(activity, ChartActivity::class.java)
+            activity.startActivity(intent)
+
+            true
+        })
+        setData(10, 800f)
 
         return view
     }
@@ -69,6 +88,61 @@ class DMFFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         mListener = null
+    }
+
+    private fun setData(count: Int, range: Float) {
+
+        val values = ArrayList<Entry>()
+
+        for (i in 0 until count) {
+            val `val` = (Math.random() * range).toFloat() + 3
+            values.add(Entry(i.toFloat(), `val`))
+        }
+
+        val set1: LineDataSet
+
+        if (smallChart?.data!= null && smallChart!!.data.dataSetCount > 0) {
+            set1 = smallChart!!.data.getDataSetByIndex(0) as LineDataSet
+            set1.values = values
+            smallChart!!.data.notifyDataChanged()
+            smallChart!!.notifyDataSetChanged()
+        } else {
+            // create a dataset and give it a type
+            set1 = LineDataSet(values, "DataSet 1")
+
+            set1.setDrawIcons(false)
+
+            // set the line to be drawn like this "- - - - - -"
+            set1.enableDashedLine(10f, 5f, 0f)
+            set1.enableDashedHighlightLine(10f, 5f, 0f)
+            set1.color = Color.BLACK
+            set1.setCircleColor(Color.BLACK)
+            set1.lineWidth = 1f
+            set1.circleRadius = 3f
+            set1.setDrawCircleHole(false)
+            set1.valueTextSize = 9f
+            set1.setDrawFilled(false)
+            set1.formLineWidth = 1f
+            set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
+            set1.formSize = 15f
+
+//            if (Utils.getSDKInt() >= 18) {
+//                // fill drawable only supported on api level 18 and above
+//                val drawable = ContextCompat.getDrawable(this, R.drawable.fade_red)
+//                set1.fillDrawable = drawable
+//            } else {
+            set1.fillColor = Color.BLACK
+//            }
+
+            val dataSets = ArrayList<ILineDataSet>()
+            dataSets.add(set1) // add the datasets
+
+            // create a data object with the datasets
+            val data = LineData(dataSets)
+
+            // set data
+            smallChart!!.data = data
+        }
     }
 
     /**

@@ -48,9 +48,9 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     private val onOpenDocView = View.OnClickListener { view ->
         var filePath = if (view == legalButton) {
-            "https://s3-ap-southeast-2.amazonaws.com/dmf-app/doc/terms-and-condition.html"
+            "https://s3-ap-southeast-2.amazonaws.com/dmf-app/doc/terms-and-condition-android.html"
         } else {
-            "https://s3-ap-southeast-2.amazonaws.com/dmf-app/doc/user-guide.html"
+            "https://s3-ap-southeast-2.amazonaws.com/dmf-app/doc/user-guide-android.html"
         }
 
         val transaction = activity.supportFragmentManager.beginTransaction()

@@ -18,23 +18,42 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.236">
+        app:layout_constraintVertical_bias="0">
+
+        <ImageView
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/logoHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20px"
+            app:srcCompat="@drawable/logo_header_small"/>
+
+        <TextView
+            android:layout_marginTop="20px"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Welcome! sign in to continue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <EditText
-            android:id="@+id/editText"
+            android:layout_marginTop="20px"
+            android:id="@+id/userNameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="username"
             android:inputType="textPersonName"
-            android:text="username" />
+            android:text="" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/passwordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="password"
             android:ems="10"
             android:inputType="textPassword"
-            android:text="password" />
+            android:text="" />
 
         <Space
             android:layout_width="match_parent"
@@ -44,28 +63,24 @@
             android:id="@+id/submitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Submit" />
-
-        <Button
-            android:id="@+id/readButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Read"/>
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="40dp"
+            android:backgroundTint="@color/colorWhite"
+            android:text="Sign in" />
 
     </LinearLayout>
 
-    <TextView
+    <Button
+        android:id="@+id/resetPasswordButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="40dp"
+        android:layout_marginLeft="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/textView2"
-        android:text="Wrong username"
-        android:textAlignment="center"
-        tools:layout_editor_absoluteX="15dp"
-        tools:layout_editor_absoluteY="285dp" />
+        android:textColor="@color/colorLightGrey"
+        android:backgroundTint="@color/colorWhite"
+        android:background="@android:color/transparent"
+        android:layout_marginBottom="30px"
+        android:text="@string/reset_password"/>
 
 </android.support.constraint.ConstraintLayout>

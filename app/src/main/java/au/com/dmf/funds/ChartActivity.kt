@@ -12,6 +12,9 @@ import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.android.synthetic.main.activity_chart.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import android.graphics.DashPathEffect
+import android.graphics.PorterDuff
+import android.text.Html
+import android.view.MenuItem
 
 
 /**
@@ -58,6 +61,12 @@ class ChartActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_chart)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val upArrow = resources.getDrawable(R.drawable.abc_ic_ab_back_material)
+        upArrow.clearColorFilter()
+        upArrow.setColorFilter(this.resources.getColor(R.color.colorWhite), PorterDuff.Mode.MULTIPLY)
+        supportActionBar?.setHomeAsUpIndicator(upArrow)
+
+        supportActionBar?.title = Html.fromHtml("<font color='#ffffff'>Fund Chart</font>")
 
         mVisible = true
 
@@ -70,6 +79,17 @@ class ChartActivity : AppCompatActivity() {
         dummy_button.setOnTouchListener(mDelayHideTouchListener)
 
         setData(100, 1000f)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            (android.R.id.home) -> {
+                this.finish()
+                return true
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setData(count: Int, range: Float) {
@@ -103,7 +123,7 @@ class ChartActivity : AppCompatActivity() {
             set1.circleRadius = 3f
             set1.setDrawCircleHole(false)
             set1.valueTextSize = 9f
-            set1.setDrawFilled(true)
+            set1.setDrawFilled(false)
             set1.formLineWidth = 1f
             set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
             set1.formSize = 15f
@@ -113,7 +133,7 @@ class ChartActivity : AppCompatActivity() {
 //                val drawable = ContextCompat.getDrawable(this, R.drawable.fade_red)
 //                set1.fillDrawable = drawable
 //            } else {
-                set1.fillColor = Color.BLACK
+            set1.fillColor = Color.BLACK
 //            }
 
             val dataSets = ArrayList<ILineDataSet>()

@@ -4,18 +4,33 @@
     android:layout_height="match_parent"
     tools:context="au.com.dmf.funds.DMFFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/dmfTV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_dmf_fragment" />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_marginTop="50dp"
-        android:id="@+id/openChartBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Open Chart"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:orientation="vertical">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/smallChart"
+                android:layout_width="match_parent"
+                android:layout_height="210dp" />
+
+            <Button
+                android:layout_marginVertical="210dp"
+                android:id="@+id/openChartBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:text="Open Chart" />
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </FrameLayout>
