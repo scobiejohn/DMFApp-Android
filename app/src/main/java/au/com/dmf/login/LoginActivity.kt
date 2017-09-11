@@ -96,7 +96,9 @@ class LoginActivity : AppCompatActivity() {
                     val confirmCode = data.getStringExtra("confirmCode")
                     if (newPassword != null && confirmCode != null) {
                         showWaitDialog("Setting new password")
-
+                        resetPasswordContinuation.setPassword(newPassword)
+                        resetPasswordContinuation.setVerificationCode(confirmCode)
+                        resetPasswordContinuation.continueTask()
                     }
                 }
             }
@@ -159,6 +161,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun resetPassword() {
+        AWSManager.userPool?.getUser(userNameInput.text.toString())?.forgotPasswordInBackground(forgotPasswordHandler)
+    }
+
+    private fun getResetPassword(continuation: ForgotPasswordContinuation?) {
+        this.resetPasswordContinuation = continuation!!
         val intent = Intent(this, ForgotPasswordActivity::class.java)
         startActivityForResult(intent, 2)
     }
@@ -200,7 +207,6 @@ class LoginActivity : AppCompatActivity() {
             closeWaitWaitDialog()
 
             enterApp()
-
         }
     })
 
@@ -224,7 +230,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun getResetCode(continuation: ForgotPasswordContinuation?) {
-
+            closeWaitWaitDialog()
+            getResetPassword(continuation)
         }
 
         override fun equals(other: Any?): Boolean {
@@ -239,6 +246,8 @@ class LoginActivity : AppCompatActivity() {
             return super.toString()
         }
     })
+
+
 
 }
 

@@ -6,7 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">@color/colorWhite</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimary</item>
         <!--<item name="android:actionMenuTextColor">@color/colorWhite</item>-->
     </style>
 

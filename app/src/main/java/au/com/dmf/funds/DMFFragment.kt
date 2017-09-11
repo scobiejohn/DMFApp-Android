@@ -51,12 +51,6 @@ class DMFFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_dmf, container, false)
 
-        val btn = view.findViewById<Button>(R.id.openChartBtn)
-        btn.setOnClickListener({ _ ->
-            val intent = Intent(activity, ChartActivity::class.java)
-            activity.startActivity(intent)
-        })
-
         smallChart = view.findViewById(R.id.smallChart)
         smallChart!!.setOnLongClickListener({ _ ->
             val intent = Intent(activity, ChartActivity::class.java)

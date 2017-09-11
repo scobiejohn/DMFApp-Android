@@ -21,14 +21,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="210dp" />
 
-            <Button
-                android:layout_marginVertical="210dp"
-                android:id="@+id/openChartBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:text="Open Chart" />
-
         </LinearLayout>
     </ScrollView>
 
