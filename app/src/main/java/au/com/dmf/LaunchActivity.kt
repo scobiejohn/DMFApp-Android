@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
 import au.com.dmf.login.LoginActivity
+import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
+import au.com.dmf.utils.Constants
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation
@@ -27,7 +29,12 @@ class LaunchActivity : AppCompatActivity() {
             user.getSessionInBackground(object: AuthenticationHandler{
                 override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
                     println("$userSession")
-                    goSignIn()
+
+                    val idToken = userSession?.idToken?.jwtToken
+                    println("idToken : $idToken")
+                    val keyString = "cognito-idp.ap-southeast-2.amazonaws.com/" + Constants.CognitoIdentityUserPoolId
+
+                    enterApp(keyString, idToken!!)
                 }
 
                 override fun onFailure(exception: Exception?) {
@@ -36,6 +43,7 @@ class LaunchActivity : AppCompatActivity() {
 
                 override fun getAuthenticationDetails(authenticationContinuation: AuthenticationContinuation?, userId: String?) {
                     println("$authenticationContinuation")
+                    goSignIn()
                 }
 
                 override fun authenticationChallenge(continuation: ChallengeContinuation?) {
@@ -49,6 +57,13 @@ class LaunchActivity : AppCompatActivity() {
         } else {
             goSignIn()
         }
+    }
+
+    private fun enterApp(loginKey: String, loginValue: String) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("loginKey", loginKey)
+        intent.putExtra("loginValue", loginValue)
+        this.startActivity(intent)
     }
 
     private fun goSignIn() {

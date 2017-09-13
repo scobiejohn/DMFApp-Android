@@ -1,6 +1,7 @@
 package au.com.dmf.settings
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,9 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import au.com.dmf.LaunchActivity
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
+import au.com.dmf.services.DynamoDBManager
+import au.com.dmf.utils.AWSManager
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 /**
@@ -70,6 +74,20 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         legalButton.setOnClickListener(onOpenDocView)
         val userGuideButton = view.findViewById<Button>(R.id.userGuideButton)
         userGuideButton.setOnClickListener(onOpenDocView)
+
+        val signOutButton = view.findViewById<Button>(R.id.signOutButton)
+        signOutButton.setOnClickListener({
+            AWSManager.userPool?.currentUser?.signOut()
+            val intent = Intent(activity.applicationContext, LaunchActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            activity.startActivity(intent)
+        })
+
+
+        DynamoDBManager.test({ list ->
+            println(list)
+            println(list[0].UserFileName)
+        })
 
         return view
     }

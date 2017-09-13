@@ -9,13 +9,16 @@ import android.text.TextWatcher
 import au.com.dmf.MainActivity
 import au.com.dmf.R
 import au.com.dmf.model.User
+import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
+import au.com.dmf.utils.Constants
 import com.afollestad.materialdialogs.MaterialDialog
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.*
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper
 import com.vicpin.krealmextensions.queryFirst
 
 import kotlinx.android.synthetic.main.activity_login.*
@@ -150,8 +153,10 @@ class LoginActivity : AppCompatActivity() {
         passwordInput.setText("")
     }
 
-    private fun enterApp() {
+    private fun enterApp(loginKey: String, loginValue: String) {
         val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("loginKey", loginKey)
+        intent.putExtra("loginValue", loginValue)
         this.startActivity(intent)
     }
 
@@ -205,8 +210,11 @@ class LoginActivity : AppCompatActivity() {
             println("onSuccess")
 
             closeWaitWaitDialog()
+            val idToken = userSession?.idToken?.jwtToken
+            println("idToken : $idToken")
+            val keyString = "cognito-idp.ap-southeast-2.amazonaws.com/" + Constants.CognitoIdentityUserPoolId
 
-            enterApp()
+            enterApp(keyString, idToken!!)
         }
     })
 

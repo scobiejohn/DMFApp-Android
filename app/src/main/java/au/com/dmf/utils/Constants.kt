@@ -6,8 +6,8 @@ class Constants {
 
     companion object {
         const val CognitoIdentityUserPoolId = "ap-southeast-2_fAJM772JL"
-        const val CognitoIdentityUserPoolAppClientId = "7p25lv0vai0oe49vo8bmb16knh"
-        const val CognitoIdentityUserPoolAppClientSecret = "19k6pgv62vguc1095jpts12fuhm29d4qu579puvt7ev6avkj0jnm"
+        const val CognitoIdentityUserPoolAppClientId = "2o0od2g1q958ofo7h5dp8ssrdt"
+        const val CognitoIdentityUserPoolAppClientSecret = "9df9jh9d5mgqc6mij3trrqg3n9tu6er44vdeiei6j2k98p8t02"
 
         const val AWSCognitoUserPoolsSignInProviderKey = "UserPool"
 

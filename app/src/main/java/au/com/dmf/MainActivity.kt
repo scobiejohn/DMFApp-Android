@@ -10,6 +10,7 @@ import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.funds.BrightCapitalFragment
 import au.com.dmf.funds.DMFFragment
 import au.com.dmf.funds.FundsFragment
+import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.settings.HtmlFileFragment
 import au.com.dmf.settings.SettingsFragment
 import au.com.dmf.tasks.TasksFragment
@@ -39,6 +40,14 @@ class MainActivity : AppCompatActivity(),
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         AndroidNetworking.initialize(applicationContext)
+
+        val extras = intent.extras
+        val loginKey = extras.getString("loginKey")
+        val loginValue = extras.getString("loginValue")
+        val logins = HashMap<String, String>()
+        logins.put(loginKey, loginValue)
+
+        DynamoDBManager.initClient(this, logins)
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->

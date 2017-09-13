@@ -41,6 +41,18 @@
                 android:text="Legal"/>
 
 
+            <android.support.v4.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+
+            <Button
+                android:id="@+id/signOutButton"
+                android:text="Sign out"
+                android:textColor="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
         </LinearLayout>
 
     </ScrollView>

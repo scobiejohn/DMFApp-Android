@@ -48,6 +48,9 @@ dependencies {
         transitive = true
     }
 
+    //Anko
+    compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
+
     //aws
     compile 'com.amazonaws:aws-android-sdk-core:2.4.7'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.4.7'

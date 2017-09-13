@@ -1,7 +1,11 @@
 package au.com.dmf.services
 
+import android.content.Context
+import android.util.Log
 import au.com.dmf.utils.Constants
 import com.amazonaws.AmazonServiceException
+import com.amazonaws.auth.CognitoCachingCredentialsProvider
+import com.amazonaws.auth.CognitoCredentialsProvider
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey
@@ -9,10 +13,79 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.PaginatedScanList
+import com.amazonaws.regions.Region
+import com.amazonaws.regions.Regions
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import com.amazonaws.ClientConfiguration
+
+
 
 object DynamoDBManager {
 
     private val TAG = "DynamoDBManager"
+
+    var ddb: AmazonDynamoDBClient? = null
+
+    fun initClient(context: Context, logins: HashMap<String, String>) {
+        val credentials = CognitoCachingCredentialsProvider(context, Constants.COGNITO_IDENTITY_POOL_ID, Constants.COGNITO_REGIONTYPE)
+        credentials.withLogins(logins)
+        ddb = Region.getRegion(Regions.AP_SOUTHEAST_2) // CRUCIAL
+                .createClient(
+                        AmazonDynamoDBClient::class.java,
+                        credentials,
+                        ClientConfiguration()
+                )
+    }
+
+    fun wipeCredentialsOnAuthError(ex: AmazonServiceException): Boolean {
+        Log.e(TAG, "Error: wipeCredentialsOnAuthError called " + ex)
+        // STS
+        // http://docs.amazonwebservices.com/STS/latest/APIReference/CommonErrors.html
+        if (ex.errorCode == "IncompleteSignature"
+                || ex.errorCode == "InternalFailure"
+                || ex.errorCode == "InvalidClientTokenId"
+                || ex.errorCode == "OptInRequired"
+                || ex.errorCode == "RequestExpired"
+                || ex.errorCode == "ServiceUnavailable"
+
+                // DynamoDB
+                // http://docs.amazonwebservices.com/amazondynamodb/latest/developerguide/ErrorHandling.html#APIErrorTypes
+                || ex.errorCode == "AccessDeniedException"
+                || ex.errorCode == "IncompleteSignatureException"
+                || ex.errorCode == "MissingAuthenticationTokenException"
+                || ex.errorCode == "ValidationException"
+                || ex.errorCode == "InternalFailure"
+                || ex.errorCode == "InternalServerError"){
+
+            return true
+        }
+
+        return false
+    }
+
+    fun test(callback: (ArrayList<DDDMFUserAssetUploadedTableRow>) -> Unit) {
+
+        val mapper = DynamoDBMapper(ddb)
+        val scanExpression = DynamoDBScanExpression()
+
+        doAsync {
+            try {
+                val result = mapper.scan(DDDMFUserAssetUploadedTableRow::class.java, scanExpression)
+                val resultList = ArrayList<DDDMFUserAssetUploadedTableRow>()
+                for (row in result) {
+                    resultList.add(row)
+                }
+
+                uiThread {
+                    callback(resultList)
+                }
+            } catch (ex: AmazonServiceException) {
+                wipeCredentialsOnAuthError(ex)
+            }
+        }
+
+    }
 
 
     @DynamoDBTable(tableName = "DMFUSERDATAHISTORYFROMS3TableName")
