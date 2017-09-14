@@ -87,7 +87,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         DynamoDBManager.test({ list ->
             println(list)
             println(list[0].UserFileName)
-        })
+        }, {println("FAILED")})
 
         return view
     }

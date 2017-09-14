@@ -64,7 +64,7 @@ object DynamoDBManager {
         return false
     }
 
-    fun test(callback: (ArrayList<DDDMFUserAssetUploadedTableRow>) -> Unit) {
+    fun test(success: (ArrayList<DDDMFUserAssetUploadedTableRow>) -> Unit, failure: () -> Unit) {
 
         val mapper = DynamoDBMapper(ddb)
         val scanExpression = DynamoDBScanExpression()
@@ -73,17 +73,22 @@ object DynamoDBManager {
             try {
                 val result = mapper.scan(DDDMFUserAssetUploadedTableRow::class.java, scanExpression)
                 val resultList = ArrayList<DDDMFUserAssetUploadedTableRow>()
-                for (row in result) {
-                    resultList.add(row)
-                }
+                result.forEach { row -> resultList.add(row) }
 
                 uiThread {
-                    callback(resultList)
+                    success(resultList)
                 }
             } catch (ex: AmazonServiceException) {
                 wipeCredentialsOnAuthError(ex)
+                uiThread {
+                    failure()
+                }
             }
         }
+
+    }
+
+    fun getUserHistoryData(success: (ArrayList<DDDMFUserDataHistoryFromS3TableRow>) -> Unit, failure: () -> Unit) {
 
     }
 

@@ -14,15 +14,29 @@ import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
 import com.afollestad.materialdialogs.MaterialDialog
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.*
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper
+import com.vicpin.krealmextensions.deleteAll
+import com.vicpin.krealmextensions.queryAll
 import com.vicpin.krealmextensions.queryFirst
+import com.vicpin.krealmextensions.save
 
 import kotlinx.android.synthetic.main.activity_login.*
+import java.util.*
+
 class LoginActivity : AppCompatActivity() {
+
+    lateinit var userName: String
+    lateinit var password: String
+
+    companion object {
+        private val TAG = LoginActivity::class.java.simpleName
+    }
 
     lateinit var waitDialog: MaterialDialog
     lateinit var resetPasswordContinuation: ForgotPasswordContinuation
@@ -39,7 +53,9 @@ class LoginActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {}
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                submitBtn.isEnabled = (userNameInput.text.toString().length > 1 && passwordInput.text.toString().length > 5)
+                userName = userNameInput.text.toString()
+                password = passwordInput.text.toString()
+                submitBtn.isEnabled = userName.length > 1 && password.length > 5
                 resetPasswordButton.isEnabled = userNameInput.text.toString().length > 1
             }
         })
@@ -48,13 +64,14 @@ class LoginActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {}
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                submitBtn.isEnabled = (userNameInput.text.toString().length > 2 && passwordInput.text.toString().length > 5)
+                userName = userNameInput.text.toString()
+                password = passwordInput.text.toString()
+                submitBtn.isEnabled = userName.length > 1 && password.length > 5
             }
         })
 
         submitBtn.setOnClickListener({
             //User("1234", "6789", 1111, "ray@mail.com", "Raymond").save()
-
             signIn()
         })
 
@@ -153,7 +170,36 @@ class LoginActivity : AppCompatActivity() {
         passwordInput.setText("")
     }
 
-    private fun enterApp(loginKey: String, loginValue: String) {
+    private fun getUserDetails(loginKey: String, loginValue: String) {
+        val userName = AWSManager.user
+        AWSManager.userPool?.getUser(userName)?.getDetailsInBackground(object : GetDetailsHandler{
+            override fun onSuccess(cognitoUserDetails: CognitoUserDetails?) {
+                println("$cognitoUserDetails")
+                enterApp(cognitoUserDetails!!, loginKey, loginValue)
+            }
+
+            override fun onFailure(exception: java.lang.Exception?) {
+                println("Could not fetch user details")
+            }
+        })
+
+    }
+
+    private fun enterApp(userDetails:CognitoUserDetails, loginKey: String, loginValue: String) {
+        User().deleteAll()
+
+        var email = ""
+        var fileName = ""
+        for ((key, value) in userDetails.attributes.attributes) {
+            if (key == "email") {
+                email = value
+            } else if (key == "custom:fund_file_name") {
+                fileName = value
+            }
+        }
+
+        User(UUID.randomUUID().toString(), password, -1, email, userName, fileName, 0).save()
+
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("loginKey", loginKey)
         intent.putExtra("loginValue", loginValue)
@@ -214,7 +260,7 @@ class LoginActivity : AppCompatActivity() {
             println("idToken : $idToken")
             val keyString = "cognito-idp.ap-southeast-2.amazonaws.com/" + Constants.CognitoIdentityUserPoolId
 
-            enterApp(keyString, idToken!!)
+            getUserDetails(keyString, idToken!!)
         }
     })
 

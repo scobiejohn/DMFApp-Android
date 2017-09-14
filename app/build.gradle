@@ -69,4 +69,7 @@ dependencies {
 
     //MPAndroidChart
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+
+    //Kotpref: Android SharedPreference delegation for Kotlin
+    compile "com.chibatching.kotpref:kotpref:2.1.2"
 }

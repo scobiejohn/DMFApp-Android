@@ -2,6 +2,8 @@ package au.com.dmf
 
 import android.app.Application
 import android.content.res.Configuration
+import android.util.Log
+import com.chibatching.kotpref.Kotpref
 import io.realm.Realm
 import java.io.File
 import java.io.FileOutputStream
@@ -21,6 +23,10 @@ class DMFApplication : Application() {
                 .schemaVersion(1)
                 .build()
         Realm.setDefaultConfiguration(config)
+
+        Log.d("DMFApplication", "Realm file path: " + Realm.getDefaultConfiguration()?.path)
+
+        Kotpref.init(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

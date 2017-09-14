@@ -25,6 +25,10 @@ class MainActivity : AppCompatActivity(),
         DMFFragment.OnFragmentInteractionListener,
         BrightCapitalFragment.OnFragmentInteractionListener {
 
+    companion object {
+        private val TAG = MainActivity::class.java.simpleName
+    }
+
     override fun onFragmentInteraction(fta: FragmentToActivity) {
         supportActionBar?.title = Html.fromHtml("<font color='#ffffff'>" + fta.name + "</font>")
     }
