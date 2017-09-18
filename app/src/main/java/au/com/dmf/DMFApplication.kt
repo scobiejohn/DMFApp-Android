@@ -20,7 +20,7 @@ class DMFApplication : Application() {
         Realm.init(this)
         val config = RealmConfiguration.Builder()
                 .name("default.realm")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .build()
         Realm.setDefaultConfiguration(config)
 

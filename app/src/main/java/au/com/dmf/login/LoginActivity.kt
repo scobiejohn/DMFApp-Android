@@ -4,14 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
-import android.text.TextWatcher
 import au.com.dmf.MainActivity
 import au.com.dmf.R
 import au.com.dmf.model.User
-import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
+import au.com.dmf.utils.afterterTextChanged
 import com.afollestad.materialdialogs.MaterialDialog
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails
@@ -20,10 +18,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.*
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
-import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper
 import com.vicpin.krealmextensions.deleteAll
-import com.vicpin.krealmextensions.queryAll
-import com.vicpin.krealmextensions.queryFirst
 import com.vicpin.krealmextensions.save
 
 import kotlinx.android.synthetic.main.activity_login.*
@@ -49,26 +44,18 @@ class LoginActivity : AppCompatActivity() {
         submitBtn.isEnabled = false
         resetPasswordButton.isEnabled = false
 
-        userNameInput.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                userName = userNameInput.text.toString()
-                password = passwordInput.text.toString()
-                submitBtn.isEnabled = userName.length > 1 && password.length > 5
-                resetPasswordButton.isEnabled = userNameInput.text.toString().length > 1
-            }
-        })
+        userNameInput.afterterTextChanged {
+            userName = userNameInput.text.toString()
+            password = passwordInput.text.toString()
+            submitBtn.isEnabled = userName.length > 1 && password.length > 5
+            resetPasswordButton.isEnabled = userNameInput.text.toString().length > 1
+        }
 
-        passwordInput.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                userName = userNameInput.text.toString()
-                password = passwordInput.text.toString()
-                submitBtn.isEnabled = userName.length > 1 && password.length > 5
-            }
-        })
+        passwordInput.afterterTextChanged {
+            userName = userNameInput.text.toString()
+            password = passwordInput.text.toString()
+            submitBtn.isEnabled = userName.length > 1 && password.length > 5
+        }
 
         submitBtn.setOnClickListener({
             //User("1234", "6789", 1111, "ray@mail.com", "Raymond").save()
@@ -198,7 +185,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        User(UUID.randomUUID().toString(), password, -1, email, userName, fileName, 0).save()
+        User(userName, password, -1, email, fileName, 0, -1, "19700101").save()
 
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("loginKey", loginKey)

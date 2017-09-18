@@ -14,8 +14,10 @@ import au.com.dmf.LaunchActivity
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
+import au.com.dmf.model.User
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
+import com.vicpin.krealmextensions.queryFirst
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 /**
@@ -84,10 +86,24 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         })
 
 
-        DynamoDBManager.test({ list ->
-            println(list)
-            println(list[0].UserFileName)
-        }, {println("FAILED")})
+//        DynamoDBManager.test({ list ->
+//            println(list)
+//            println(list[0].UserFileName)
+//        }, {println("FAILED")})
+
+//        DynamoDBManager.getUserHistoryData({response ->
+//            println(response)
+//        }, {})
+
+        DynamoDBManager.checkHistoryDataUploadTimestamp({
+
+            val user = User().queryFirst()
+            println(user)
+
+            DynamoDBManager.getUserHistoryData({response ->
+                            println(response)
+        }, {})
+        }, {})
 
         return view
     }
