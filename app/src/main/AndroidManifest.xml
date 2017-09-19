@@ -26,14 +26,20 @@
             android:name=".login.LoginActivity"
             android:label="@string/title_activity_login"
             android:noHistory="true"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".login.NewPasswordActivity"
             android:label="@string/title_activity_new_password"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".login.ForgotPasswordActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity android:name=".notifications.NotificationsActivity" />
         <activity android:name=".InvitePeople.InvitePeopleActivity" />
         <activity
@@ -45,6 +51,8 @@
         <activity
             android:name=".LaunchActivity"
             android:noHistory="true"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

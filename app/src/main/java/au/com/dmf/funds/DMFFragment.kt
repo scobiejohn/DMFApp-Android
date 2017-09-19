@@ -4,15 +4,19 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.DashPathEffect
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.SeekBar
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
+import au.com.dmf.utils.Constants
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -35,6 +39,7 @@ class DMFFragment : Fragment() {
     private var mParam2: String? = null
 
     private var smallChart: LineChart? = null
+    private var fundSeekBar: SeekBar? = null
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -59,6 +64,22 @@ class DMFFragment : Fragment() {
             true
         })
         setData(10, 800f)
+
+        this.fundSeekBar = view.findViewById(R.id.fund_seek_bar)
+        this.fundSeekBar!!.incrementProgressBy(1)
+        this.fundSeekBar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                println(p1)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+
+            }
+        })
 
         return view
     }
