@@ -51,6 +51,10 @@ dependencies {
     //Anko
     compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
 
+    //Koi
+    compile 'com.mcxiaoke.koi:core:0.5.5'
+    //compile 'com.mcxiaoke.koi:async:0.5.5'
+
     //aws
     compile 'com.amazonaws:aws-android-sdk-core:2.4.7'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.4.7'
@@ -72,4 +76,7 @@ dependencies {
 
     //Kotpref: Android SharedPreference delegation for Kotlin
     compile "com.chibatching.kotpref:kotpref:2.1.2"
+
+    //SmoothRefreshLayout
+    compile 'com.github.dkzwm:SmoothRefreshLayout:1.4.6.1'
 }

@@ -16,12 +16,14 @@ import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.data.Task
 import au.com.dmf.services.JiraServiceManager
+import com.afollestad.materialdialogs.DialogAction
+import com.afollestad.materialdialogs.MaterialDialog
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.obj
 import com.beust.klaxon.string
-import kotlinx.android.synthetic.main.fragment_tasks.*
+import me.dkzwm.widget.srl.MaterialSmoothRefreshLayout
+import me.dkzwm.widget.srl.RefreshingListenerAdapter
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * A simple [Fragment] subclass.
@@ -33,12 +35,10 @@ import java.util.*
  */
 class TasksFragment : Fragment() {
 
-    private var tasksListView: RecyclerView? = null
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var adapter: TasksAdapter? = null
-    private var taskVerticalLine: View? = null
-
-    private var tasks: ArrayList<Task>? = ArrayList<Task>()
+    private lateinit var tasksListView: RecyclerView
+    private lateinit var layoutManager: RecyclerView.LayoutManager
+    private lateinit var adapter: TasksAdapter
+    private lateinit var refreshLayout: MaterialSmoothRefreshLayout
 
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -62,30 +62,45 @@ class TasksFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_tasks, container, false)
 
-        var localTasksListView = view.findViewById<RecyclerView>(R.id.tasksListView)
-        localTasksListView.setHasFixedSize(true)
+        tasksListView = view.findViewById(R.id.tasksListView)
+        tasksListView.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(activity)
-        adapter = TasksAdapter(tasks!!)
-        layoutManager = LinearLayoutManager(activity.applicationContext)
-        localTasksListView.layoutManager = layoutManager
-        localTasksListView.itemAnimator = DefaultItemAnimator()
-        localTasksListView.adapter = adapter
+        adapter = TasksAdapter(object : TasksAdapter.OnTaskClickListener {
+            override fun onTaskClick(task: Task) {
+                requestTaskWithdrawn(task)
+            }
+        })
+        layoutManager = LinearLayoutManager(activity)
+        tasksListView.layoutManager = layoutManager
+        tasksListView.itemAnimator = DefaultItemAnimator()
+        tasksListView.adapter = adapter
 
-        val dividerItemDecoration = DividerItemDecoration(localTasksListView.context, LinearLayoutManager.VERTICAL)
-        localTasksListView.addItemDecoration(dividerItemDecoration)
+        refreshLayout = view.findViewById(R.id.tasks_frag_with_recycler_view)
+        refreshLayout.setDisableLoadMore(false)
+        refreshLayout.materialStyle()
+        refreshLayout.setEnableScrollToBottomAutoLoadMore(true)
+        refreshLayout.setOnRefreshListener(object : RefreshingListenerAdapter() {
+            override fun onRefreshBegin(isRefresh: Boolean) {
+                if (isRefresh) {
+                    refreshData()
+                } else {
+                    //append
+                    loadMoreData()
+                }
+            }
+        })
+        refreshLayout.autoRefresh()
 
-        this.tasksListView = localTasksListView
-
-        this.taskVerticalLine = view.findViewById(R.id.taskVerticalLine)
-
-        prepareTaskData()
+        val dividerItemDecoration = DividerItemDecoration(this.tasksListView.context, LinearLayoutManager.VERTICAL)
+        tasksListView.addItemDecoration(dividerItemDecoration)
 
         return view
     }
 
-    private fun prepareTaskData() {
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-        JiraServiceManager.getTasks(0, { (jsonArray) ->
+    private fun refreshData() {
+        var tasks: ArrayList<Task> = ArrayList()
+        JiraServiceManager.getTasks(0, { jsonArray, total ->
+            adapter.numTotalTasks = total
             for (i in 0 until jsonArray.size) {
                 val task = Task()
                 task.id = jsonArray[i].string("id")!!
@@ -94,15 +109,52 @@ class TasksFragment : Fragment() {
                 task.status = o.obj("status")?.string("name")!!
                 val timeString = o.string("created")
                 task.timeStamp = formatter.parse(timeString)
-                tasks!!.add(task)
+                tasks.add(task)
             }
 
-            if (taskListProgressBar != null) {
-                taskListProgressBar.visibility = View.GONE
-            }
-            adapter?.notifyDataSetChanged()
-            this.taskVerticalLine!!.visibility = View.VISIBLE
+            adapter.updateData(tasks)
+            refreshLayout.refreshComplete()
         })
+    }
+
+    private fun loadMoreData() {
+        val startAt = adapter.tasks.size
+        if (startAt < adapter.numTotalTasks) {
+            var tasks: ArrayList<Task> = ArrayList()
+            JiraServiceManager.getTasks(startAt, { jsonArray, total ->
+                for (i in 0 until jsonArray.size) {
+                    val task = Task()
+                    task.id = jsonArray[i].string("id")!!
+                    val o: JsonObject = (jsonArray[i]).obj("fields") as JsonObject
+                    task.details = o.string("summary")!!
+                    task.status = o.obj("status")?.string("name")!!
+                    val timeString = o.string("created")
+                    task.timeStamp = formatter.parse(timeString)
+                    tasks.add(task)
+                }
+
+                adapter.appendData(tasks)
+                refreshLayout.refreshComplete()
+            })
+        }
+    }
+
+    private fun requestTaskWithdrawn(task: Task) {
+        val message = "Do you want to withdraw the request: " + task.details
+        MaterialDialog.Builder(activity)
+                .title("Confirmation")
+                .content(message)
+                .positiveText("Yes")
+                .negativeText("Cancel")
+                .onAny { _, which ->
+                    if (which == DialogAction.POSITIVE) {
+                        JiraServiceManager.withdrawTicket(task.id)
+                        adapter.updateSingleData(task)
+                    } else {
+                    }
+                }
+                .cancelable(false)
+                .show()
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -141,6 +193,8 @@ class TasksFragment : Fragment() {
     }
 
     companion object {
+        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private val ARG_PARAM1 = "param1"

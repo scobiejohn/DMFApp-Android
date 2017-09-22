@@ -4,25 +4,26 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.DashPathEffect
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.SeekBar
+import android.widget.TextView
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
-import au.com.dmf.utils.Constants
+import au.com.dmf.services.JiraServiceManager
+import com.afollestad.materialdialogs.MaterialDialog
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import kotlinx.android.synthetic.main.fragment_dmf.*
+import com.afollestad.materialdialogs.DialogAction
+import org.w3c.dom.Text
+
 
 /**
  * A simple [Fragment] subclass.
@@ -40,6 +41,10 @@ class DMFFragment : Fragment() {
 
     private var smallChart: LineChart? = null
     private var fundSeekBar: SeekBar? = null
+    private lateinit var cashPercentageTx: TextView
+    private lateinit var fundPercentageTx: TextView
+
+    private var seekBarProgress: Int = 0
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -56,6 +61,9 @@ class DMFFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_dmf, container, false)
 
+        cashPercentageTx = view.findViewById(R.id.cash_percentage)
+        fundPercentageTx = view.findViewById(R.id.fund_percentage)
+
         smallChart = view.findViewById(R.id.smallChart)
         smallChart!!.setOnLongClickListener({ _ ->
             val intent = Intent(activity, ChartActivity::class.java)
@@ -68,20 +76,66 @@ class DMFFragment : Fragment() {
         this.fundSeekBar = view.findViewById(R.id.fund_seek_bar)
         this.fundSeekBar!!.incrementProgressBy(1)
         this.fundSeekBar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                println(p1)
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-
-            }
-
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
+                cashFunChangeRequest(p0!!.progress)
             }
         })
 
+        this.fundSeekBar!!.progress = seekBarProgress
+
         return view
+    }
+
+    /**
+     * Change Cash/Fund percentage
+     */
+    private fun cashFunChangeRequest(toProgress: Int) {
+
+        if (toProgress == this.seekBarProgress) {
+            return
+        }
+
+        val seekBarChangeString = "Cash " + displayValueForExtreme(toProgress, true) + "%, Fund " + displayValueForExtreme(5 - toProgress, false) + "%."
+        val bodyContent = "Do you want to make a request for\n" + seekBarChangeString
+        MaterialDialog.Builder(activity)
+                .title("Cash Allocation Change")
+                .content(bodyContent)
+                .positiveText("OK")
+                .negativeText("Cancel")
+                .onAny { _, which ->
+                    if (which == DialogAction.POSITIVE) {
+                        seekBarProgress = fundSeekBar!!.progress
+                        cashPercentageTx.text = displayValueForExtreme(seekBarProgress, true) + "%"
+                        fundPercentageTx.text = displayValueForExtreme(5 - seekBarProgress, false) + "%"
+
+                        JiraServiceManager.createTicket("Cash Allocation Change","Darling Macro Fund", null, seekBarChangeString, null, null)
+                    } else {
+                        fundSeekBar!!.progress = seekBarProgress
+
+                    }
+                }
+                .show()
+    }
+    private fun displayValueForExtreme(value: Int, forCash: Boolean = true): String {
+        val updatedValue = 100 - value * 20
+        var displayValue = updatedValue.toString()
+        if (updatedValue == 0) {
+           if (forCash) {
+               displayValue = "Min"
+           } else {
+               displayValue = "0"
+           }
+        } else if (updatedValue == 100) {
+            if (forCash) {
+                displayValue = "Max"
+            } else {
+                displayValue = "100"
+            }
+        }
+
+        return displayValue
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -198,4 +252,4 @@ class DMFFragment : Fragment() {
             return fragment
         }
     }
-}// Required empty public constructor
+}
