@@ -1,14 +1,20 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="au.com.dmf.funds.FundsFragment">
 
+    <TextView
+        android:id="@+id/notification_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorSoftBlue"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
+        android:layout_below="@id/notification_top_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </android.support.v4.view.ViewPager>
 
-</FrameLayout>
+</RelativeLayout>

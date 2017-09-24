@@ -40,7 +40,11 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
-        <activity android:name=".notifications.NotificationsActivity" />
+        <activity android:name=".notifications.NotificationsActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleDialog"
+            android:excludeFromRecents="true"/>
         <activity android:name=".InvitePeople.InvitePeopleActivity" />
         <activity
             android:name=".funds.ChartActivity"

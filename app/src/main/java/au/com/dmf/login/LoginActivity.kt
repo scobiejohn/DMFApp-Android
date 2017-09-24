@@ -185,7 +185,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        User(userName, password, -1, email, fileName, 0, -1, "19700101").save()
+        User(userName, password, 0, email, fileName, 0, -1, "19700101").save()
 
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("loginKey", loginKey)

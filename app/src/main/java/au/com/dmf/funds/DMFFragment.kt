@@ -41,6 +41,7 @@ class DMFFragment : Fragment() {
 
     private var smallChart: LineChart? = null
     private var fundSeekBar: SeekBar? = null
+    private lateinit var fundSeekBarTitleTx: TextView
     private lateinit var cashPercentageTx: TextView
     private lateinit var fundPercentageTx: TextView
 
@@ -61,6 +62,7 @@ class DMFFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_dmf, container, false)
 
+        fundSeekBarTitleTx = view.findViewById(R.id.fund_seek_bar_title)
         cashPercentageTx = view.findViewById(R.id.cash_percentage)
         fundPercentageTx = view.findViewById(R.id.fund_percentage)
 
@@ -109,6 +111,7 @@ class DMFFragment : Fragment() {
                         seekBarProgress = fundSeekBar!!.progress
                         cashPercentageTx.text = displayValueForExtreme(seekBarProgress, true) + "%"
                         fundPercentageTx.text = displayValueForExtreme(5 - seekBarProgress, false) + "%"
+                        fundSeekBarTitleTx.text = "Funds In Cash : " + displayValueForExtreme(toProgress, true) + "%\nFunds In DMF : " + displayValueForExtreme(5 - toProgress, false) + "%"
 
                         JiraServiceManager.createTicket("Cash Allocation Change","Darling Macro Fund", null, seekBarChangeString, null, null)
                     } else {

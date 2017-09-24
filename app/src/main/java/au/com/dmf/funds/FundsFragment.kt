@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.view.*
+import android.widget.TextView
 import au.com.dmf.InvitePeople.InvitePeopleActivity
 
 import au.com.dmf.R
@@ -67,6 +68,11 @@ class FundsFragment : Fragment() {
         })
         viewPager.adapter = viewPagerAdapter
         viewPagerAdapter.notifyDataSetChanged()
+
+        val notificationBar = view.findViewById<TextView>(R.id.notification_top_bar)
+        notificationBar.setOnClickListener({
+            startActivity(Intent(activity, NotificationsActivity::class.java))
+        })
 
         return view
     }

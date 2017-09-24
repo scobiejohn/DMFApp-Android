@@ -28,6 +28,9 @@ class LaunchActivity : AppCompatActivity() {
         val user = AWSManager.userPool?.currentUser
         val userName = user?.userId
         if (userName != null)  {
+            enterApp("", "")
+            return
+
             user.getSessionInBackground(object: AuthenticationHandler{
                 override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
                     println("$userSession")

@@ -321,6 +321,7 @@
                 android:layout_height="20dp" />
 
             <TextView
+                android:id="@+id/fund_seek_bar_title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textAlignment="center"
                 android:text="Funds In Cash : Min%\nFunds In DMF : Max%"

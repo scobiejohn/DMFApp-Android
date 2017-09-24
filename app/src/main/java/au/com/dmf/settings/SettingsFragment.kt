@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentTransaction
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.*
 import au.com.dmf.LaunchActivity
 
 import au.com.dmf.R
@@ -17,8 +17,13 @@ import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.model.User
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
+import com.afollestad.materialdialogs.MaterialDialog
 import com.vicpin.krealmextensions.queryFirst
+import com.vicpin.krealmextensions.save
 import kotlinx.android.synthetic.main.fragment_settings.*
+import android.R.array
+
+
 
 /**
  * A simple [Fragment] subclass.
@@ -32,6 +37,11 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
     override fun onFragmentInteraction(fta: FragmentToActivity) {
 
     }
+
+    private lateinit var checkBox: CheckBox
+    private lateinit var pinET: EditText
+
+    private val autoSignOutOptions: ArrayList<String> =  ArrayList()
 
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -50,6 +60,9 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         if (mListener != null) {
             mListener!!.onFragmentInteraction(FragmentToActivity("Settings", Uri.EMPTY))
         }
+
+        val options = arrayOf("Never", "After 5 Mins", "After 15 Mins", "After 30 Mins", "After 60 Mins")
+        autoSignOutOptions.addAll(options)
     }
 
     private val onOpenDocView = View.OnClickListener { view ->
@@ -61,9 +74,9 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
         val transaction = activity.supportFragmentManager.beginTransaction()
         val fragment = HtmlFileFragment.newInstance(filePath, "")
-        transaction.replace(R.id.content, fragment)
+        transaction.add(R.id.content, fragment)
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        transaction.addToBackStack(null)
+        transaction.addToBackStack("HtmlFileFragment")
         transaction.commit()
     }
 
@@ -85,6 +98,27 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             activity.startActivity(intent)
         })
 
+        checkBox = view.findViewById<CheckBox>(R.id.pin_check_box)
+        pinET = view.findViewById<EditText>(R.id.pin_code)
+        checkBox.setOnCheckedChangeListener{_, isChecked ->
+            pinET.visibility = if(isChecked) View.VISIBLE else View.GONE
+            if (pinET.visibility == View.GONE) {
+                pinET.setText("")
+            }
+        }
+
+        val user = User().queryFirst()
+        if (user!!.pin != 0) {
+            checkBox.isChecked = true
+            pinET.setText(user!!.pin.toString())
+        }
+
+        val autoSignOutButton = view.findViewById<Button>(R.id.auto_sign_out_session_button)
+        val signOutSessionTV = view.findViewById<TextView>(R.id.auto_sign_out_session_code)
+        signOutSessionTV.text = autoSignOutSessionValueToLabel(user!!.sessionDuration)
+        autoSignOutButton.setOnClickListener({
+            openSignOutSeesionDialog()
+        })
 
 //        DynamoDBManager.test({ list ->
 //            println(list)
@@ -95,17 +129,38 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 //            println(response)
 //        }, {})
 
+        /*
         DynamoDBManager.checkHistoryDataUploadTimestamp({
-
             val user = User().queryFirst()
             println(user)
-
             DynamoDBManager.getUserHistoryData({response ->
                             println(response)
         }, {})
         }, {})
+        */
 
         return view
+    }
+
+    private fun openSignOutSeesionDialog() {
+        MaterialDialog.Builder(activity)
+                .title("Auto Sign Out")
+                .items(autoSignOutOptions)
+                .itemsCallbackSingleChoice(-1, MaterialDialog.ListCallbackSingleChoice { dialog, view, which, text ->
+                    /**
+                     * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                     * returning false here won't allow the newly selected radio button to actually be selected.
+                     */
+                    /**
+                     * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                     * returning false here won't allow the newly selected radio button to actually be selected.
+                     */
+                    true
+                })
+                .negativeText("Cancel")
+                .positiveText("Choose")
+                .cancelable(false)
+                .show()
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -117,6 +172,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
@@ -127,7 +183,43 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     override fun onDetach() {
         super.onDetach()
+
+        //update pin
+        val user = User().queryFirst()
+        if (checkBox.isChecked && pinET.text.length == 4) {
+            with(user!!) {
+                User(name, password, pinET.text.toString().toInt(), email, fundFile, sessionDuration, historyDataTimestamp, assetDate).save()
+            }
+        } else {
+            with(user!!) {
+                User(name, password, 0, email, fundFile, sessionDuration, historyDataTimestamp, assetDate).save()
+            }
+        }
+
         mListener = null
+    }
+
+
+    /**
+     * helper
+     */
+    private fun autoSignOutSessionLabelToValue(label: String): Int {
+        return when(label) {
+            autoSignOutOptions[1] -> 5
+            autoSignOutOptions[2] -> 15
+            autoSignOutOptions[3] -> 30
+            autoSignOutOptions[4] -> 60
+            else -> 0
+        }
+    }
+    private fun autoSignOutSessionValueToLabel(value: Int): String {
+        return when(value) {
+            5 -> autoSignOutOptions[1]
+            15 -> autoSignOutOptions[2]
+            30 -> autoSignOutOptions[3]
+            60 -> autoSignOutOptions[4]
+            else -> autoSignOutOptions[0]
+        }
     }
 
     /**
