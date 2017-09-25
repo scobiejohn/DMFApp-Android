@@ -22,7 +22,8 @@ import com.vicpin.krealmextensions.queryFirst
 import com.vicpin.krealmextensions.save
 import kotlinx.android.synthetic.main.fragment_settings.*
 import android.R.array
-
+import android.graphics.Color
+import com.afollestad.materialdialogs.DialogAction
 
 
 /**
@@ -40,6 +41,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     private lateinit var checkBox: CheckBox
     private lateinit var pinET: EditText
+    private lateinit var signOutSessionTV: TextView
 
     private val autoSignOutOptions: ArrayList<String> =  ArrayList()
 
@@ -98,8 +100,8 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             activity.startActivity(intent)
         })
 
-        checkBox = view.findViewById<CheckBox>(R.id.pin_check_box)
-        pinET = view.findViewById<EditText>(R.id.pin_code)
+        checkBox = view.findViewById(R.id.pin_check_box)
+        pinET = view.findViewById(R.id.pin_code)
         checkBox.setOnCheckedChangeListener{_, isChecked ->
             pinET.visibility = if(isChecked) View.VISIBLE else View.GONE
             if (pinET.visibility == View.GONE) {
@@ -114,10 +116,10 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         }
 
         val autoSignOutButton = view.findViewById<Button>(R.id.auto_sign_out_session_button)
-        val signOutSessionTV = view.findViewById<TextView>(R.id.auto_sign_out_session_code)
+        signOutSessionTV = view.findViewById<TextView>(R.id.auto_sign_out_session_code)
         signOutSessionTV.text = autoSignOutSessionValueToLabel(user!!.sessionDuration)
         autoSignOutButton.setOnClickListener({
-            openSignOutSeesionDialog()
+            openSignOutSessionDialog(user!!.sessionDuration)
         })
 
 //        DynamoDBManager.test({ list ->
@@ -142,11 +144,19 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         return view
     }
 
-    private fun openSignOutSeesionDialog() {
+    private fun openSignOutSessionDialog(sessionDuration: Int) {
+        val selectedIndex = when(sessionDuration) {
+            5 -> 1
+            15 -> 2
+            30 -> 3
+            60 -> 4
+            else -> 0
+        }
+
         MaterialDialog.Builder(activity)
                 .title("Auto Sign Out")
                 .items(autoSignOutOptions)
-                .itemsCallbackSingleChoice(-1, MaterialDialog.ListCallbackSingleChoice { dialog, view, which, text ->
+                .itemsCallbackSingleChoice(selectedIndex, MaterialDialog.ListCallbackSingleChoice { dialog, view, which, text ->
                     /**
                      * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
                      * returning false here won't allow the newly selected radio button to actually be selected.
@@ -155,12 +165,31 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
                      * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
                      * returning false here won't allow the newly selected radio button to actually be selected.
                      */
+                    updateUserSessionDuration(which)
                     true
                 })
                 .negativeText("Cancel")
+                .negativeColor(Color.GRAY)
                 .positiveText("Choose")
                 .cancelable(false)
                 .show()
+    }
+
+    private fun updateUserSessionDuration(sessionDurationIndex: Int) {
+        val updatedSessionDuration = when(sessionDurationIndex) {
+            1 -> 5
+            2 -> 15
+            3 -> 30
+            4 -> 60
+            else -> 0
+        }
+
+        val user = User().queryFirst()
+        with(user!!) {
+            User(name, password, pin, email, fundFile, updatedSessionDuration, historyDataTimestamp, assetDate).save()
+        }
+
+        signOutSessionTV.text = autoSignOutSessionValueToLabel(updatedSessionDuration)
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -48,7 +48,6 @@ class Constants {
         const val TASK_STATUS_WITHDRAWN = "Withdrawn"
         const val TASK_STATUS_OTHER = "Other"
 
-
     }
 
 }
