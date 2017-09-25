@@ -47,6 +47,7 @@ dependencies {
     compile('com.github.orangegangsters:lollipin:2.0.0@aar') {
         transitive = true
     }
+    compile 'com.andrognito.pinlockview:pinlockview:2.1.0'
 
     //Anko
     compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"

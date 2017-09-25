@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
 import au.com.dmf.login.LoginActivity
+import au.com.dmf.login.PinCodeActivity
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
@@ -23,6 +24,11 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+
+        val intent = Intent(this, PinCodeActivity::class.java)
+        this.startActivity(intent)
+        return
+
 
         AWSManager.init(applicationContext)
         val user = AWSManager.userPool?.currentUser

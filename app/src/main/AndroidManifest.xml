@@ -21,30 +21,31 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".login.LoginActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_login"
             android:noHistory="true"
-            android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".login.NewPasswordActivity"
-            android:label="@string/title_activity_new_password"
             android:configChanges="orientation"
+            android:label="@string/title_activity_new_password"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".login.ForgotPasswordActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".notifications.NotificationsActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitleDialog"
-            android:excludeFromRecents="true"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".notifications.NotificationsActivity"
+            android:configChanges="orientation"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoTitleDialog" />
         <activity android:name=".InvitePeople.InvitePeopleActivity" />
         <activity
             android:name=".funds.ChartActivity"
@@ -54,8 +55,8 @@
             android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".LaunchActivity"
-            android:noHistory="true"
             android:configChanges="orientation"
+            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -64,6 +65,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".login.PinCodeActivity"
+            android:noHistory="true"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

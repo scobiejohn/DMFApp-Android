@@ -23,6 +23,7 @@ import com.vicpin.krealmextensions.save
 import kotlinx.android.synthetic.main.fragment_settings.*
 import android.R.array
 import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import com.afollestad.materialdialogs.DialogAction
 
 
@@ -169,6 +170,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
                     true
                 })
                 .negativeText("Cancel")
+                //.negativeColor(ContextCompat.getColor(activity.applicationContext, R.color.dark_grey_color))
                 .negativeColor(Color.GRAY)
                 .positiveText("Choose")
                 .cancelable(false)
