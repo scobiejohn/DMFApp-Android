@@ -1,5 +1,6 @@
 package au.com.dmf.funds
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -14,6 +15,7 @@ import android.widget.TextView
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
+import au.com.dmf.login.PinCodeActivity
 import au.com.dmf.services.JiraServiceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.mikephil.charting.charts.LineChart
@@ -44,6 +46,10 @@ class DMFFragment : Fragment() {
     private lateinit var fundSeekBarTitleTx: TextView
     private lateinit var cashPercentageTx: TextView
     private lateinit var fundPercentageTx: TextView
+
+    private lateinit var strategyBtnTx: TextView
+    private lateinit var transferBtnTx: TextView
+    private lateinit var redeemBtnTx: TextView
 
     private var seekBarProgress: Int = 0
 
@@ -87,7 +93,25 @@ class DMFFragment : Fragment() {
 
         this.fundSeekBar!!.progress = seekBarProgress
 
+        this.strategyBtnTx = view.findViewById(R.id.strategy_btn)
+        this.transferBtnTx = view.findViewById(R.id.transfer_fund_btn)
+        this.redeemBtnTx = view.findViewById(R.id.redeem_btn)
+
+        this.strategyBtnTx.setOnClickListener({
+            val intent = Intent(activity, PinCodeActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+        })
+
         return view
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            val pinResult = data!!.getStringExtra("PIN")
+            if (pinResult == "YES") {
+                //TODO
+            }
+        }
     }
 
     /**
@@ -232,6 +256,9 @@ class DMFFragment : Fragment() {
     }
 
     companion object {
+
+        private val REQUEST_CODE = 3
+
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private val ARG_PARAM1 = "param1"

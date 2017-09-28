@@ -398,6 +398,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/strategy_btn"
                     android:paddingTop="15dp"
                     android:layout_marginRight="5dp"
                     android:textAlignment="center"
@@ -410,6 +411,7 @@
                     android:background="@drawable/outline_button_background"/>
 
                 <TextView
+                    android:id="@+id/transfer_fund_btn"
                     android:paddingTop="15dp"
                     android:textAlignment="center"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -421,6 +423,7 @@
                     android:background="@drawable/outline_button_background"/>
 
                 <TextView
+                    android:id="@+id/redeem_btn"
                     android:paddingTop="15dp"
                     android:layout_marginLeft="5dp"
                     android:textAlignment="center"

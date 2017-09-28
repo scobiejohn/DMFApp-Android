@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context="au.com.dmf.login.PinCodeActivity">
 
     <TextView
@@ -12,6 +13,7 @@
         android:layout_marginTop="30dp"
         android:textAlignment="center"
         android:layout_width="match_parent"
+        android:textColor="@color/colorPrimary"
         android:layout_height="wrap_content"
         android:text="Enter 4 Digits Pin Code"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -43,5 +45,17 @@
         app:keypadDeleteButtonSize="22dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/pin_code_cancel_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginBottom="70dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorGrey"
+        android:text="Cancel"/>
+
 
 </android.support.constraint.ConstraintLayout>

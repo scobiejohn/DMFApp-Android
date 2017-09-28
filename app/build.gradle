@@ -16,6 +16,7 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
+        exclude 'META-INF/library_release.kotlin_module'
     }
     buildTypes {
         release {
@@ -43,10 +44,12 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.4.7'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.7'
 
-    //Lollipin
-    compile('com.github.orangegangsters:lollipin:2.0.0@aar') {
-        transitive = true
-    }
+    //RxJava
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.5'
+    compile 'com.github.Doublemine:RxBus:2.1.2-kotlin'
+
+    //pinlockview
     compile 'com.andrognito.pinlockview:pinlockview:2.1.0'
 
     //Anko

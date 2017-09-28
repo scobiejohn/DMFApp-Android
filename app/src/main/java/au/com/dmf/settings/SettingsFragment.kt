@@ -25,6 +25,7 @@ import android.R.array
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import com.afollestad.materialdialogs.DialogAction
+import org.jetbrains.anko.support.v4.find
 
 
 /**

@@ -8,6 +8,7 @@
     tools:context="au.com.dmf.login.LoginActivity">
 
     <LinearLayout
+        android:id="@+id/signInPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"

@@ -3,14 +3,20 @@ package au.com.dmf.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.view.WindowCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import au.com.dmf.MainActivity
 import au.com.dmf.R
 import au.com.dmf.model.User
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
 import au.com.dmf.utils.afterterTextChanged
+import com.afollestad.materialdialogs.GravityEnum
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.Theme
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
@@ -19,9 +25,12 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
 import com.vicpin.krealmextensions.deleteAll
+import com.vicpin.krealmextensions.queryFirst
 import com.vicpin.krealmextensions.save
 
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_main.*
+import java.awt.font.TextAttribute
 import java.util.*
 
 class LoginActivity : AppCompatActivity() {
@@ -64,15 +73,13 @@ class LoginActivity : AppCompatActivity() {
 
         resetPasswordButton.setOnClickListener({
             resetPassword()
-
-            /*
-            MaterialDialog.Builder(this)
-                    .title("Password successfully changed.")
-                    .content("")
-                    .positiveText("Close")
-                    .show()
-                    */
         })
+
+        val user = User().queryFirst()
+        if (user!!.pin != 0) {
+            val intent = Intent(this, PinCodeActivity::class.java)
+            startActivityForResult(intent, 3)
+        }
 
         /*
         resetPasswordButton.setOnClickListener({
@@ -109,6 +116,20 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             }
+            //pin pad
+            (3) -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val pinResult = data!!.getStringExtra("PIN")
+                    if (pinResult == "YES") {
+                        signInPanel.visibility = View.INVISIBLE
+                        resetPasswordButton.visibility = View.INVISIBLE
+                        val user = User().queryFirst()
+                        userName = user!!.name
+                        password = user!!.password
+                        signIn()
+                    }
+                }
+            }
         }
     }
 
@@ -123,7 +144,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signIn() {
-        val userName = userNameInput.text.toString()
         AWSManager.user = userName
         showWaitDialog("Sign in")
 
@@ -131,7 +151,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun getUserAuthentication(continuation: AuthenticationContinuation, userName: String) {
-        val authenticationDetails = AuthenticationDetails(userNameInput.text.toString(), passwordInput.text.toString(), null)
+        val authenticationDetails = AuthenticationDetails(userName, password, null)
         continuation.setAuthenticationDetails(authenticationDetails)
         continuation.continueTask()
     }
@@ -139,12 +159,12 @@ class LoginActivity : AppCompatActivity() {
     private fun showWaitDialog(title: String, body: String = "please wait ...") {
         closeWaitWaitDialog()
         waitDialog = MaterialDialog.Builder(this)
+                .theme(Theme.LIGHT)
                 .autoDismiss(false)
-                .title(title)
-                .content(body)
-                .progress(true, 0)
+                .customView(R.layout.sign_in_dialog, false)
                 .show()
         waitDialog.setCancelable(false)
+        waitDialog.window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
     }
     private fun closeWaitWaitDialog() {
         try {
@@ -235,6 +255,8 @@ class LoginActivity : AppCompatActivity() {
         override fun onFailure(exception: java.lang.Exception?) {
             println("onFailure")
 
+            signInPanel.visibility = View.VISIBLE
+            resetPasswordButton.visibility = View.VISIBLE
             clearInputs()
             closeWaitWaitDialog()
         }
@@ -273,18 +295,6 @@ class LoginActivity : AppCompatActivity() {
         override fun getResetCode(continuation: ForgotPasswordContinuation?) {
             closeWaitWaitDialog()
             getResetPassword(continuation)
-        }
-
-        override fun equals(other: Any?): Boolean {
-            return super.equals(other)
-        }
-
-        override fun hashCode(): Int {
-            return super.hashCode()
-        }
-
-        override fun toString(): String {
-            return super.toString()
         }
     })
 

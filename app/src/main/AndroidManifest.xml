@@ -69,7 +69,7 @@
             android:noHistory="true"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/NoTitleDialog"></activity>
     </application>
 
 </manifest>

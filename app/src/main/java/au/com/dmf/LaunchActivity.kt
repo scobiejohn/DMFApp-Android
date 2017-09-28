@@ -25,17 +25,14 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        val intent = Intent(this, PinCodeActivity::class.java)
-        this.startActivity(intent)
-        return
-
-
         AWSManager.init(applicationContext)
         val user = AWSManager.userPool?.currentUser
         val userName = user?.userId
         if (userName != null)  {
-            enterApp("", "")
-            return
+
+            //FIXME: test
+//            enterApp("", "")
+//            return
 
             user.getSessionInBackground(object: AuthenticationHandler{
                 override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
