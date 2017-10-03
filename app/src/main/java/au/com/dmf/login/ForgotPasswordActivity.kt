@@ -16,7 +16,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         passwordResetSubmitButton.isEnabled = false
         passwordResetSubmitButton.setOnClickListener({
-            exit(confirmationCodeTx.text.toString(), passwordResetTx.text.toString())
+            exit(passwordResetTx.text.toString(), confirmationCodeTx.text.toString())
         })
 
         confirmationCodeTx.afterterTextChanged {
@@ -31,11 +31,11 @@ class ForgotPasswordActivity : AppCompatActivity() {
     private fun exit(newPass: String, code: String) {
         val intent = Intent()
         if (newPass == null || code == null) {
-            intent.putExtra("newPass", "")
-            intent.putExtra("code", "")
+            intent.putExtra("newPassword", "")
+            intent.putExtra("confirmCode", "")
         } else {
-            intent.putExtra("newPass", newPass)
-            intent.putExtra("code", code)
+            intent.putExtra("newPassword", newPass)
+            intent.putExtra("confirmCode", code)
         }
         setResult(Activity.RESULT_OK, intent)
         finish()

@@ -193,7 +193,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun enterApp(userDetails:CognitoUserDetails, loginKey: String, loginValue: String) {
-        User().deleteAll()
+        val user = User().queryFirst()
 
         var email = ""
         var fileName = ""
@@ -205,7 +205,15 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        User(userName, password, 0, email, fileName, 0, -1, "19700101").save()
+        if (user != null) {
+            user!!.name = userName
+            user!!.password = password
+            user!!.email = email
+            user!!.fundFile = fileName
+            user!!.save()
+        } else {
+            User(userName, password, 0, email, fileName, 0, -1, "19700101").save()
+        }
 
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("loginKey", loginKey)
@@ -276,7 +284,7 @@ class LoginActivity : AppCompatActivity() {
     private val forgotPasswordHandler = (object: ForgotPasswordHandler {
         override fun onSuccess() {
             closeWaitWaitDialog()
-            MaterialDialog.Builder(applicationContext)
+            MaterialDialog.Builder(this@LoginActivity)
                     .title("Password successfully changed.")
                     .content("")
                     .positiveText("Close")
@@ -284,8 +292,9 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onFailure(exception: java.lang.Exception?) {
+            println(exception.toString())
             closeWaitWaitDialog()
-            MaterialDialog.Builder(applicationContext)
+            MaterialDialog.Builder(this@LoginActivity)
                     .title("Reset password failed.")
                     .content("")
                     .positiveText("Close")

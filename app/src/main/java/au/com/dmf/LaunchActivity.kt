@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Html
 import au.com.dmf.login.LoginActivity
 import au.com.dmf.login.PinCodeActivity
+import au.com.dmf.model.User
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
@@ -17,6 +18,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
+import com.vicpin.krealmextensions.queryFirst
+import com.vicpin.krealmextensions.save
 import java.lang.Exception
 
 class LaunchActivity : AppCompatActivity() {
@@ -28,6 +31,7 @@ class LaunchActivity : AppCompatActivity() {
         AWSManager.init(applicationContext)
         val user = AWSManager.userPool?.currentUser
         val userName = user?.userId
+
         if (userName != null)  {
 
             //FIXME: test

@@ -65,11 +65,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.PinCodeActivity"
-            android:noHistory="true"
+        <activity
+            android:name=".login.PinCodeActivity"
             android:configChanges="orientation"
+            android:noHistory="true"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitleDialog"></activity>
+            android:theme="@style/NoTitleDialog" />
+
+        <service android:name=".android_service.DMFFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".android_service.DMFFirebaseMessagingService"
+            android:enabled="false"
+            android:exported="false"></service>
     </application>
 
 </manifest>
