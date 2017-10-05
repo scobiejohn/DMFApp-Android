@@ -5,7 +5,7 @@ apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "au.com.dmf"
         minSdkVersion 22
@@ -84,6 +84,9 @@ dependencies {
 
     //SmoothRefreshLayout
     compile 'com.github.dkzwm:SmoothRefreshLayout:1.4.6.1'
+
+    //KAndroid
+    compile 'com.pawegio.kandroid:kandroid:0.8.5@aar'
 }
 
 apply plugin: 'com.google.gms.google-services'

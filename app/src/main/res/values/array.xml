@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="fundMultipliers">
+        <item>Core</item>
+        <item>Growth</item>
+        <item>Aggressive</item>
+    </string-array>
+</resources>

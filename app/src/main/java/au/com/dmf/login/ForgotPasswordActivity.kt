@@ -5,7 +5,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import au.com.dmf.R
-import au.com.dmf.utils.afterterTextChanged
+import au.com.dmf.utils.afterTextChanged
 import kotlinx.android.synthetic.main.activity_forgot_password.*
 
 class ForgotPasswordActivity : AppCompatActivity() {
@@ -19,11 +19,11 @@ class ForgotPasswordActivity : AppCompatActivity() {
             exit(passwordResetTx.text.toString(), confirmationCodeTx.text.toString())
         })
 
-        confirmationCodeTx.afterterTextChanged {
+        confirmationCodeTx.afterTextChanged {
             passwordResetSubmitButton.isEnabled = (confirmationCodeTx.text.toString().length > 5) && (passwordResetTx.text.toString().length > 5)
         }
 
-        passwordResetTx.afterterTextChanged {
+        passwordResetTx.afterTextChanged {
             passwordResetSubmitButton.isEnabled = (confirmationCodeTx.text.toString().length > 5) && (passwordResetTx.text.toString().length > 5)
         }
     }

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import au.com.dmf.R
 import au.com.dmf.utils.AWSManager
-import au.com.dmf.utils.afterterTextChanged
+import au.com.dmf.utils.afterTextChanged
 
 import kotlinx.android.synthetic.main.activity_new_password.*
 
@@ -16,7 +16,7 @@ class NewPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_password)
 
-        newPasswordTx.afterterTextChanged {
+        newPasswordTx.afterTextChanged {
             newPasswordSubmitButton.isEnabled = newPasswordTx.text.toString().length > 5
         }
 

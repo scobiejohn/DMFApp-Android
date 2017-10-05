@@ -10,13 +10,16 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
 
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.login.PinCodeActivity
+import au.com.dmf.model.User
 import au.com.dmf.services.JiraServiceManager
+import au.com.dmf.utils.alert
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
@@ -24,7 +27,9 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.afollestad.materialdialogs.DialogAction
+import com.vicpin.krealmextensions.queryFirst
 import org.w3c.dom.Text
+import au.com.dmf.R.id.passwordInput
 
 
 /**
@@ -50,6 +55,8 @@ class DMFFragment : Fragment() {
     private lateinit var strategyBtnTx: TextView
     private lateinit var transferBtnTx: TextView
     private lateinit var redeemBtnTx: TextView
+
+    private lateinit var redeemAmountEditText: EditText
 
     private var seekBarProgress: Int = 0
 
@@ -83,7 +90,7 @@ class DMFFragment : Fragment() {
 
         this.fundSeekBar = view.findViewById(R.id.fund_seek_bar)
         this.fundSeekBar!!.incrementProgressBy(1)
-        this.fundSeekBar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        this.fundSeekBar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {
@@ -98,8 +105,59 @@ class DMFFragment : Fragment() {
         this.redeemBtnTx = view.findViewById(R.id.redeem_btn)
 
         this.strategyBtnTx.setOnClickListener({
-            val intent = Intent(activity, PinCodeActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE)
+            if (!hasPin()) {
+                activity.alert("Reminder", "Please set up PIN first in 'Settings' page.")
+            } else {
+                MaterialDialog.Builder(activity)
+                        .title("Multiplier")
+                        .items(R.array.fundMultipliers)
+                        .itemsCallbackSingleChoice(-1, { dialog, view, which, text ->
+
+                            println(which)
+                            println(text)
+
+                            /**
+                             * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                             * returning false here won't allow the newly selected radio button to actually be selected.
+                             */
+                            /**
+                             * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                             * returning false here won't allow the newly selected radio button to actually be selected.
+                             */
+                            true
+                        })
+                        .positiveText("Choose")
+                        .negativeColor(Color.GRAY)
+                        .negativeText("Cancel")
+                        .show()
+            }
+        })
+
+        this.transferBtnTx.setOnClickListener({
+            if (!hasPin()) {
+                activity.alert("Reminder", "Please set up PIN first in 'Settings' page.")
+            } else {
+
+            }
+        })
+
+        this.redeemBtnTx.setOnClickListener({
+            if (!hasPin()) {
+                activity.alert("Reminder", "Please set up PIN first in 'Settings' page.")
+            } else {
+                val dialog = MaterialDialog.Builder(activity)
+                        .title("Enter amount to redeem")
+                        .customView(R.layout.dialog_redeem, true)
+                        .positiveText("OK")
+                        .negativeColor(Color.DKGRAY)
+                        .negativeText(android.R.string.cancel)
+                        .onPositive(
+                                { dialog1, which -> println("Amount: " + redeemAmountEditText.text.toString()) })
+                        .build()
+                dialog.show()
+
+                redeemAmountEditText = dialog.customView!!.findViewById(R.id.redeem_amount_text)
+            }
         })
 
         return view
@@ -129,6 +187,7 @@ class DMFFragment : Fragment() {
                 .title("Cash Allocation Change")
                 .content(bodyContent)
                 .positiveText("OK")
+                .negativeColor(Color.GRAY)
                 .negativeText("Cancel")
                 .onAny { _, which ->
                     if (which == DialogAction.POSITIVE) {
@@ -137,7 +196,7 @@ class DMFFragment : Fragment() {
                         fundPercentageTx.text = displayValueForExtreme(5 - seekBarProgress, false) + "%"
                         fundSeekBarTitleTx.text = "Funds In Cash : " + displayValueForExtreme(toProgress, true) + "%\nFunds In DMF : " + displayValueForExtreme(5 - toProgress, false) + "%"
 
-                        JiraServiceManager.createTicket("Cash Allocation Change","Darling Macro Fund", null, seekBarChangeString, null, null)
+                        JiraServiceManager.createTicket("Cash Allocation Change", "Darling Macro Fund", null, seekBarChangeString, null, null)
                     } else {
                         fundSeekBar!!.progress = seekBarProgress
 
@@ -145,15 +204,16 @@ class DMFFragment : Fragment() {
                 }
                 .show()
     }
+
     private fun displayValueForExtreme(value: Int, forCash: Boolean = true): String {
         val updatedValue = 100 - value * 20
         var displayValue = updatedValue.toString()
         if (updatedValue == 0) {
-           if (forCash) {
-               displayValue = "Min"
-           } else {
-               displayValue = "0"
-           }
+            if (forCash) {
+                displayValue = "Min"
+            } else {
+                displayValue = "0"
+            }
         } else if (updatedValue == 100) {
             if (forCash) {
                 displayValue = "Max"
@@ -197,7 +257,7 @@ class DMFFragment : Fragment() {
 
         val set1: LineDataSet
 
-        if (smallChart?.data!= null && smallChart!!.data.dataSetCount > 0) {
+        if (smallChart?.data != null && smallChart!!.data.dataSetCount > 0) {
             set1 = smallChart!!.data.getDataSetByIndex(0) as LineDataSet
             set1.values = values
             smallChart!!.data.notifyDataChanged()
@@ -239,6 +299,11 @@ class DMFFragment : Fragment() {
             // set data
             smallChart!!.data = data
         }
+    }
+
+    private fun hasPin(): Boolean {
+        val user = User().queryFirst()
+        return user!!.pin != 0
     }
 
     /**

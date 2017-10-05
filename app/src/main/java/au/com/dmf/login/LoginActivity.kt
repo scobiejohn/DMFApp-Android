@@ -13,7 +13,7 @@ import au.com.dmf.R
 import au.com.dmf.model.User
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
-import au.com.dmf.utils.afterterTextChanged
+import au.com.dmf.utils.afterTextChanged
 import com.afollestad.materialdialogs.GravityEnum
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.Theme
@@ -53,14 +53,14 @@ class LoginActivity : AppCompatActivity() {
         submitBtn.isEnabled = false
         resetPasswordButton.isEnabled = false
 
-        userNameInput.afterterTextChanged {
+        userNameInput.afterTextChanged {
             userName = userNameInput.text.toString()
             password = passwordInput.text.toString()
             submitBtn.isEnabled = userName.length > 1 && password.length > 5
             resetPasswordButton.isEnabled = userNameInput.text.toString().length > 1
         }
 
-        passwordInput.afterterTextChanged {
+        passwordInput.afterTextChanged {
             userName = userNameInput.text.toString()
             password = passwordInput.text.toString()
             submitBtn.isEnabled = userName.length > 1 && password.length > 5
