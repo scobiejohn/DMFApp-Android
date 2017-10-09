@@ -31,6 +31,7 @@ class Constants {
         const val DMFUSERDATAASSETFROMS3TableName = "DMF_USER_DATA_ASSET_FROM_S3"
         const val DMFUSERDATAASSETUPLOADEDTableName = "DMF_USER_ASSET_UPLOADED"
         const val DMFUSERDATAHISTORYUPLOADEDTableName = "DMF_USER_HISTORY_UPLOADED"
+        const val DMFFUNDSTableName = "DMF_FUNDS"
         const val DMFNOTIFICATIONTableName = "DMF_NOTIFICATION"
         const val DMFSUBSCRIPTIONTableName = "DMF_SUBSCRIPTION"
 

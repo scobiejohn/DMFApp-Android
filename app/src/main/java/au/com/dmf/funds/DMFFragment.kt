@@ -30,6 +30,11 @@ import com.afollestad.materialdialogs.DialogAction
 import com.vicpin.krealmextensions.queryFirst
 import org.w3c.dom.Text
 import au.com.dmf.R.id.passwordInput
+import au.com.dmf.data.FundsDetail
+import au.com.dmf.events.GetFundStateEvent
+import work.wanghao.rxbus2.RxBus
+import work.wanghao.rxbus2.Subscribe
+import work.wanghao.rxbus2.ThreadMode
 
 
 /**
@@ -244,6 +249,26 @@ class DMFFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         mListener = null
+    }
+
+    override fun onStart() {
+        super.onStart()
+        RxBus.Companion.get().register(this)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGetFundStateEvent(evt: GetFundStateEvent) {
+        val fundIno = FundsDetail.funds.get("Darling Macro Fund")
+        if (fundIno != null) {
+            println(fundIno.investable)
+            transferBtnTx.isEnabled = fundIno.investable != "NO"
+            transferBtnTx.alpha = if (fundIno.investable != "NO") 1.0f else 0.3f
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        RxBus.Companion.get().unRegister(this)
     }
 
     private fun setData(count: Int, range: Float) {

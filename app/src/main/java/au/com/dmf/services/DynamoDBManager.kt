@@ -63,6 +63,21 @@ object DynamoDBManager {
         return false
     }
 
+    fun getFundDetails(fundName: String, success: (DMFFundsTableRow) -> Unit, failure: () -> Unit) {
+        val row = DMFFundsTableRow()
+        row.FUND = fundName
+        val queryExpression = DynamoDBQueryExpression<DMFFundsTableRow>()
+                .withHashKeyValues(row)
+        doAsync {
+            try {
+                val result = mapper.query(DMFFundsTableRow::class.java, queryExpression) as PaginatedList<DMFFundsTableRow>
+                success(result.first())
+            } catch (ex: Exception) {
+                failure()
+            }
+        }
+    }
+
     fun checkHistoryDataUploadTimestamp(success: () -> Unit, failure: () -> Unit) {
         val user = User().queryFirst()
         val userFileName = user!!.fundFile
@@ -229,6 +244,16 @@ object DynamoDBManager {
         var UploadTimestamp: Long? = -1
         @get:DynamoDBAttribute(attributeName = "AssetDate")
         var AssetDate: String? = ""
+    }
+
+    @DynamoDBTable(tableName = Constants.DMFFUNDSTableName)
+    class DMFFundsTableRow {
+        @get:DynamoDBHashKey(attributeName = "FUND")
+        var FUND: String? = ""
+        @get:DynamoDBAttribute(attributeName = "InMarket")
+        var InMarket: String? = ""
+        @get:DynamoDBAttribute(attributeName = "Investable")
+        var Investable: String? = ""
     }
 
 }

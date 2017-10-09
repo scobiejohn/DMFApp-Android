@@ -9,6 +9,9 @@ import android.text.Html
 import android.view.Menu
 import android.widget.TextView
 import au.com.dmf.data.FragmentToActivity
+import au.com.dmf.data.FundInfo
+import au.com.dmf.data.FundsDetail
+import au.com.dmf.events.GetFundStateEvent
 import au.com.dmf.funds.BrightCapitalFragment
 import au.com.dmf.funds.DMFFragment
 import au.com.dmf.funds.FundsFragment
@@ -19,6 +22,7 @@ import au.com.dmf.settings.SettingsFragment
 import au.com.dmf.tasks.TasksFragment
 import com.androidnetworking.AndroidNetworking
 import kotlinx.android.synthetic.main.activity_main.*
+import work.wanghao.rxbus2.RxBus
 
 class MainActivity : AppCompatActivity(),
         FundsFragment.OnFragmentInteractionListener,
@@ -55,6 +59,12 @@ class MainActivity : AppCompatActivity(),
         logins.put(loginKey, loginValue)
 
         DynamoDBManager.initClient(this, logins)
+
+        DynamoDBManager.getFundDetails("Darling Macro Fund", {row ->
+            val fundInfo = FundInfo(row.InMarket!!, row.Investable!!)
+            FundsDetail.funds.put("Darling Macro Fund", fundInfo)
+            RxBus.Companion.get().post(GetFundStateEvent())
+        }, {})
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
