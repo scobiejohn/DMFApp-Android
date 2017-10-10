@@ -62,8 +62,15 @@ class DMFFragment : Fragment() {
     private lateinit var redeemBtnTx: TextView
 
     private lateinit var redeemAmountEditText: EditText
+    private lateinit var transferAmountEditText: EditText
 
     private var seekBarProgress: Int = 0
+
+    private var fundStrategy = "Aggressive"
+    private var isStrategyChange = false
+    private var isRedeemFund = false
+    private var toStrategy = ""
+    private var transferRedeemAMount = ""
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -113,6 +120,7 @@ class DMFFragment : Fragment() {
             if (!hasPin()) {
                 activity.alert("Reminder", "Please set up PIN first in 'Settings' page.")
             } else {
+
                 MaterialDialog.Builder(activity)
                         .title("Multiplier")
                         .items(R.array.fundMultipliers)
@@ -120,6 +128,12 @@ class DMFFragment : Fragment() {
 
                             println(which)
                             println(text)
+
+                            if (text != this.fundStrategy) {
+                                this.toStrategy = text.toString()
+                                this.isStrategyChange = true
+                                this.showPinView()
+                            }
 
                             /**
                              * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
@@ -142,7 +156,24 @@ class DMFFragment : Fragment() {
             if (!hasPin()) {
                 activity.alert("Reminder", "Please set up PIN first in 'Settings' page.")
             } else {
+                val dialog = MaterialDialog.Builder(activity)
+                        .title("Enter amount to transfer")
+                        .customView(R.layout.dialog_transfer, true)
+                        .positiveText("OK")
+                        .negativeColor(Color.DKGRAY)
+                        .negativeText(android.R.string.cancel)
+                        .onPositive(
+                                { dialog1, which ->
+                                    println("Amount: " + transferAmountEditText.text.toString())
+                                    this.transferRedeemAMount = transferAmountEditText.text.toString()
+                                    this.isStrategyChange = false
+                                    this.isRedeemFund = false
+                                    this.showPinView()
+                                })
+                        .build()
+                dialog.show()
 
+                transferAmountEditText = dialog.customView!!.findViewById(R.id.transfer_amount_text)
             }
         })
 
@@ -157,7 +188,13 @@ class DMFFragment : Fragment() {
                         .negativeColor(Color.DKGRAY)
                         .negativeText(android.R.string.cancel)
                         .onPositive(
-                                { dialog1, which -> println("Amount: " + redeemAmountEditText.text.toString()) })
+                                { dialog1, which ->
+                                    println("Amount: " + redeemAmountEditText.text.toString())
+                                    this.transferRedeemAMount = redeemAmountEditText.text.toString()
+                                    this.isStrategyChange = false
+                                    this.isRedeemFund = true
+                                    this.showPinView()
+                                })
                         .build()
                 dialog.show()
 
@@ -168,11 +205,47 @@ class DMFFragment : Fragment() {
         return view
     }
 
+    private fun doStrategyChange() {
+        JiraServiceManager.createTicket("Fund Multiplier", "Darling Macro Fund", null, null, this.toStrategy, null,
+                {},
+                {}
+        )
+    }
+
+    private fun doRedeemFund() {
+        val amount = "AUD" + transferRedeemAMount
+        JiraServiceManager.createTicket("Redeem Funds", "Darling Macro Fund", null, amount, null, null,
+                {},
+                {}
+        )
+    }
+
+    private fun doTransferFund() {
+        val amount = "AUD" + transferRedeemAMount
+        JiraServiceManager.createTicket("Transfer Funds", "Darling Macro Fund", null, amount, null, null,
+                {},
+                {}
+        )
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             val pinResult = data!!.getStringExtra("PIN")
             if (pinResult == "YES") {
-                //TODO
+                when {
+                    isStrategyChange -> {
+                        doStrategyChange()
+                    }
+                    isRedeemFund -> {
+                        doRedeemFund()
+                    }
+                    else -> {
+                        doTransferFund()
+                    }
+                }
+                isStrategyChange = false
+                isRedeemFund = false
             }
         }
     }
@@ -201,13 +274,18 @@ class DMFFragment : Fragment() {
                         fundPercentageTx.text = displayValueForExtreme(5 - seekBarProgress, false) + "%"
                         fundSeekBarTitleTx.text = "Funds In Cash : " + displayValueForExtreme(toProgress, true) + "%\nFunds In DMF : " + displayValueForExtreme(5 - toProgress, false) + "%"
 
-                        JiraServiceManager.createTicket("Cash Allocation Change", "Darling Macro Fund", null, seekBarChangeString, null, null)
+                        JiraServiceManager.createTicket("Cash Allocation Change", "Darling Macro Fund", null, seekBarChangeString, null, null, {}, {})
                     } else {
                         fundSeekBar!!.progress = seekBarProgress
 
                     }
                 }
                 .show()
+    }
+
+    private fun showPinView() {
+        val intent = Intent(activity, PinCodeActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
     private fun displayValueForExtreme(value: Int, forCash: Boolean = true): String {
@@ -347,7 +425,7 @@ class DMFFragment : Fragment() {
 
     companion object {
 
-        private val REQUEST_CODE = 3
+        private val REQUEST_CODE = 4
 
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

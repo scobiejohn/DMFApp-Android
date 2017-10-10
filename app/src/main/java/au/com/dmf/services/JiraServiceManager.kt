@@ -46,7 +46,8 @@ object JiraServiceManager {
                 })
     }
 
-    fun createTicket(type: String, fundName: String, fundMode: String? = null, amount: String? = null, multiplier: String? = null, tos: String? = null) {
+    fun createTicket(type: String, fundName: String, fundMode: String? = null, amount: String? = null, multiplier: String? = null, tos: String? = null,
+                     success: () -> Unit, failure: () -> Unit) {
         val user = User().queryFirst()
         var description = when(type) {
             "Redeem Funds" -> "Redemption of " + amount!! + " from - " + fundName
@@ -82,10 +83,12 @@ object JiraServiceManager {
                 .getAsString(object : StringRequestListener {
                     override fun onResponse(response: String?) {
                         //UserInfo.ticketSubmitted = true
+                        success()
                     }
 
                     override fun onError(anError: ANError?) {
                         println(anError)
+                        failure()
                     }
                 })
 
