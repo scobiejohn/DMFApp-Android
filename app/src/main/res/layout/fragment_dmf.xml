@@ -406,7 +406,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/colorPrimary"
                     android:layout_width="fill_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="60sp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
 
@@ -418,7 +418,7 @@
                     android:textColor="@color/colorPrimary"
                     android:text="Transfer funds"
                     android:layout_width="fill_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="60sp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
 
@@ -431,7 +431,7 @@
                     android:textColor="@color/colorPrimary"
                     android:text="Redeem"
                     android:layout_width="fill_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="60sp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
                 

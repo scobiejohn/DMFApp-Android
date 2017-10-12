@@ -178,6 +178,26 @@ object DynamoDBManager {
         val assetDate = user!!.assetDate
     }
 
+    fun getNotifications(limit: Int, success: (ArrayList<DMFNotificationTableRow>) -> Unit, failure: () -> Unit) {
+        val scanExpression = DynamoDBScanExpression()
+        scanExpression.limit = limit
+        doAsync {
+            try {
+                val result = mapper.scanPage(DMFNotificationTableRow::class.java, scanExpression).results
+                val resultList = ArrayList<DMFNotificationTableRow>()
+                result.forEach { row -> resultList.add(row) }
+
+                uiThread {
+                    success(resultList)
+                }
+            } catch (ex: AmazonServiceException) {
+                uiThread {
+                    failure()
+                }
+            }
+        }
+    }
+
     @DynamoDBTable(tableName = Constants.DMFUSERDATAHISTORYFROMS3TableName)
     class DDDMFUserDataHistoryFromS3TableRow {
         @get:DynamoDBHashKey(attributeName = "UserFileName")
@@ -256,4 +276,19 @@ object DynamoDBManager {
         var Investable: String? = ""
     }
 
+    @DynamoDBTable(tableName = Constants.DMFNOTIFICATIONTableName)
+    class DMFNotificationTableRow {
+        @get:DynamoDBHashKey(attributeName = "CreatedAt")
+        var CreatedAt: Long? = -1
+        @get:DynamoDBAttribute(attributeName = "Message")
+        var Message: String? = ""
+    }
+
+    @DynamoDBTable(tableName = Constants.DMFSUBSCRIPTIONTableName)
+    class DMFSubscriptionTableRow {
+        @get:DynamoDBHashKey(attributeName = "UserFileName")
+        var UserFileName: String? = ""
+        @get:DynamoDBAttribute(attributeName = "EndpointArn")
+        var EndpointArn: String? = ""
+    }
 }

@@ -32,6 +32,7 @@ import org.w3c.dom.Text
 import au.com.dmf.R.id.passwordInput
 import au.com.dmf.data.FundsDetail
 import au.com.dmf.events.GetFundStateEvent
+import com.pawegio.kandroid.alert
 import work.wanghao.rxbus2.RxBus
 import work.wanghao.rxbus2.Subscribe
 import work.wanghao.rxbus2.ThreadMode
@@ -163,12 +164,18 @@ class DMFFragment : Fragment() {
                         .negativeColor(Color.DKGRAY)
                         .negativeText(android.R.string.cancel)
                         .onPositive(
-                                { dialog1, which ->
+                                { _, _ ->
                                     println("Amount: " + transferAmountEditText.text.toString())
-                                    this.transferRedeemAMount = transferAmountEditText.text.toString()
-                                    this.isStrategyChange = false
-                                    this.isRedeemFund = false
-                                    this.showPinView()
+
+                                    val amount = transferAmountEditText.text.toString()
+                                    if (amount.toInt() < 1000) {
+                                        activity.alert("Reminder", "The minimum redeem amount is AUD1000")
+                                    } else {
+                                        this.transferRedeemAMount = amount
+                                        this.isStrategyChange = false
+                                        this.isRedeemFund = false
+                                        this.showPinView()
+                                    }
                                 })
                         .build()
                 dialog.show()
@@ -188,12 +195,17 @@ class DMFFragment : Fragment() {
                         .negativeColor(Color.DKGRAY)
                         .negativeText(android.R.string.cancel)
                         .onPositive(
-                                { dialog1, which ->
+                                { _, _ ->
                                     println("Amount: " + redeemAmountEditText.text.toString())
-                                    this.transferRedeemAMount = redeemAmountEditText.text.toString()
-                                    this.isStrategyChange = false
-                                    this.isRedeemFund = true
-                                    this.showPinView()
+                                    val amount = redeemAmountEditText.text.toString()
+                                    if (amount.toInt() < 1000) {
+                                        activity.alert("Reminder", "The minimum transfer amount is AUD1000")
+                                    } else {
+                                        this.transferRedeemAMount = amount
+                                        this.isStrategyChange = false
+                                        this.isRedeemFund = true
+                                        this.showPinView()
+                                    }
                                 })
                         .build()
                 dialog.show()

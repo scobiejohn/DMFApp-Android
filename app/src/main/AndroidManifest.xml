@@ -26,7 +26,6 @@
             android:name=".login.LoginActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_login"
-            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

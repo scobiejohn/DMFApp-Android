@@ -14,6 +14,7 @@ import au.com.dmf.InvitePeople.InvitePeopleActivity
 import au.com.dmf.R
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.notifications.NotificationsActivity
+import au.com.dmf.services.DynamoDBManager
 
 /**
  * A simple [Fragment] subclass.
@@ -73,6 +74,10 @@ class FundsFragment : Fragment() {
         notificationBar.setOnClickListener({
             startActivity(Intent(activity, NotificationsActivity::class.java))
         })
+
+        DynamoDBManager.getNotifications(1, { notifs ->
+            notificationBar.text = notifs[0].Message
+        }, {})
 
         return view
     }

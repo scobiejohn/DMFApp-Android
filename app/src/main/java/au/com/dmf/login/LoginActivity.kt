@@ -76,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
         })
 
         val user = User().queryFirst()
-        if (user!!.pin != 0) {
+        if (user != null && user?.pin != 0) {
             val intent = Intent(this, PinCodeActivity::class.java)
             startActivityForResult(intent, 3)
         }

@@ -80,6 +80,10 @@ class LaunchActivity : AppCompatActivity() {
 
             override fun onFailure(exception: Exception?) {
                 println("Could not fetch user details")
+                println(exception?.message)
+
+                AWSManager.userPool?.currentUser?.signOut()
+                goSignIn()
             }
         })
     }

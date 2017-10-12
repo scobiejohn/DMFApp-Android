@@ -65,7 +65,6 @@ class TasksFragment : Fragment() {
 
         tasksListView = view.findViewById(R.id.tasksListView)
         tasksListView.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(activity)
         adapter = TasksAdapter(object : TasksAdapter.OnTaskClickListener {
             override fun onTaskClick(task: Task) {
                 requestTaskWithdrawn(task)
