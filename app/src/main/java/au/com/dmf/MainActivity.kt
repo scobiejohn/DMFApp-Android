@@ -3,11 +3,13 @@ package au.com.dmf
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.text.Html
 import android.view.Menu
 import android.widget.TextView
+import android.widget.Toast
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.data.FundInfo
 import au.com.dmf.data.FundsDetail
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity(),
         HtmlFileFragment.OnFragmentInteractionListener,
         DMFFragment.OnFragmentInteractionListener,
         BrightCapitalFragment.OnFragmentInteractionListener {
+
+    private var doubleBackToExitPressedOnce = false
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
@@ -107,5 +111,22 @@ class MainActivity : AppCompatActivity(),
         }
         false
     }
+
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            if (!doubleBackToExitPressedOnce) {
+                doubleBackToExitPressedOnce = true
+                Toast.makeText(this,"Press BACK again to exit app.", Toast.LENGTH_SHORT).show()
+                Handler().postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2000)
+            } else {
+                super.onBackPressed()
+            }
+        }
+    }
+
 
 }

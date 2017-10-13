@@ -219,6 +219,8 @@ class LoginActivity : AppCompatActivity() {
         intent.putExtra("loginKey", loginKey)
         intent.putExtra("loginValue", loginValue)
         this.startActivity(intent)
+
+        finish()
     }
 
     private fun firstTimeSignIn() {
