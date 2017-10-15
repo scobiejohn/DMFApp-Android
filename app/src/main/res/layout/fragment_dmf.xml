@@ -36,14 +36,14 @@
                 android:textColor="@color/colorGrey"
                 android:text="@string/fund_dmf_title"/>
             <TextView
-                android:id="@+id/dmf_header_strategy_name"
+                android:id="@+id/dmfHeaderStrategyTx"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorGrey"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Aggressive"/>
+                android:text="Strategy"/>
             <TextView
-                android:id="@+id/dmf_header_invest_value"
+                android:id="@+id/dmfHeaderInvestValueTx"
                 android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Net Investment Value"/>
             <TextView
-                android:id="@+id/dmf_header_update"
+                android:id="@+id/dmfHeaderUpdateTx"
                 android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,10 +88,11 @@
                         android:layout_height="wrap_content"
                         android:text="Total Funds Invested"/>
                     <TextView
+                        android:id="@+id/dmfTotalFundInvestedTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUD +$300, 000"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -106,10 +107,11 @@
                         android:layout_height="wrap_content"
                         android:text="Gross Performance"/>
                     <TextView
+                        android:id="@+id/dmfGrossPerformanceTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUD +$18, 000"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -124,10 +126,11 @@
                         android:layout_height="wrap_content"
                         android:text="Gross Investment Value"/>
                     <TextView
+                        android:id="@+id/dmfGrossInvestValueTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUD +$318, 000"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -142,11 +145,12 @@
                         android:layout_height="wrap_content"
                         android:text="Fees"/>
                     <TextView
+                        android:id="@+id/dmfFeeTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorAccent"
-                        android:text="AUD -$1, 900"/>
+                        android:text="    "/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -161,10 +165,11 @@
                         android:layout_height="wrap_content"
                         android:text="Net Investment Value"/>
                     <TextView
+                        android:id="@+id/dmfNetInvestValueTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AUD $317, 788"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -197,10 +202,11 @@
                         android:layout_height="wrap_content"
                         android:text="Cash"/>
                     <TextView
+                        android:id="@+id/dmfExpCashTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="35.80%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -215,10 +221,11 @@
                         android:layout_height="wrap_content"
                         android:text="Fx"/>
                     <TextView
+                        android:id="@+id/dmfExpFxTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0.09%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -233,10 +240,11 @@
                         android:layout_height="wrap_content"
                         android:text="Bond"/>
                     <TextView
+                        android:id="@+id/dmfExpBondTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="14.39%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -251,10 +259,11 @@
                         android:layout_height="wrap_content"
                         android:text="Short Bond"/>
                     <TextView
+                        android:id="@+id/dmfExpShortBondTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="44.59%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -269,10 +278,11 @@
                         android:layout_height="wrap_content"
                         android:text="Agri"/>
                     <TextView
+                        android:id="@+id/dmfExpAgriTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0.14%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -287,10 +297,11 @@
                         android:layout_height="wrap_content"
                         android:text="Equity"/>
                     <TextView
+                        android:id="@+id/dmfExpEquityTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4.61%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -305,10 +316,11 @@
                         android:layout_height="wrap_content"
                         android:text="Precious Metals"/>
                     <TextView
+                        android:id="@+id/dmfExpMetalTx"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0.38%"/>
+                        android:text=""/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -382,12 +394,12 @@
 
             <TextView
                 android:layout_marginTop="10dp"
-                android:id="@+id/my_holdings_tx"
+                android:id="@+id/dmfMyholdingsTx"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorPrimaryDark"
                 android:textStyle="bold"
-                android:text="My holdings = $317,778"
+                android:text=""
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -399,39 +411,39 @@
 
                 <TextView
                     android:id="@+id/strategy_btn"
-                    android:paddingTop="15dp"
                     android:layout_marginRight="5dp"
-                    android:textAlignment="center"
                     android:text="Aggressive"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/colorPrimary"
                     android:layout_width="fill_parent"
-                    android:layout_height="60sp"
+                    android:textAlignment="center"
+                    android:gravity="center_vertical"
+                    android:layout_height="80dp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
 
                 <TextView
                     android:id="@+id/transfer_fund_btn"
-                    android:paddingTop="15dp"
-                    android:textAlignment="center"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/colorPrimary"
                     android:text="Transfer funds"
                     android:layout_width="fill_parent"
-                    android:layout_height="60sp"
+                    android:textAlignment="center"
+                    android:gravity="center_vertical"
+                    android:layout_height="80dp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
 
                 <TextView
                     android:id="@+id/redeem_btn"
-                    android:paddingTop="15dp"
                     android:layout_marginLeft="5dp"
-                    android:textAlignment="center"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/colorPrimary"
                     android:text="Redeem"
                     android:layout_width="fill_parent"
-                    android:layout_height="60sp"
+                    android:textAlignment="center"
+                    android:gravity="center_vertical"
+                    android:layout_height="80dp"
                     android:layout_weight="1"
                     android:background="@drawable/outline_button_background"/>
                 

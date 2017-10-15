@@ -5,8 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.DashPathEffect
+import android.graphics.Typeface
+import android.icu.util.CurrencyAmount
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +19,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 
 import au.com.dmf.R
+import au.com.dmf.R.id.edit_query
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.login.PinCodeActivity
 import au.com.dmf.model.User
@@ -30,12 +35,26 @@ import com.afollestad.materialdialogs.DialogAction
 import com.vicpin.krealmextensions.queryFirst
 import org.w3c.dom.Text
 import au.com.dmf.R.id.passwordInput
+import au.com.dmf.data.FundsDataManager
 import au.com.dmf.data.FundsDetail
 import au.com.dmf.events.GetFundStateEvent
+import au.com.dmf.services.DynamoDBManager
+import au.com.dmf.utils.ChartXAxisValueFormatter
+import au.com.dmf.utils.ChartYAxisValueFormatter
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.ChartData
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.pawegio.kandroid.alert
+import kotlinx.android.synthetic.main.fragment_dmf.*
 import work.wanghao.rxbus2.RxBus
 import work.wanghao.rxbus2.Subscribe
 import work.wanghao.rxbus2.ThreadMode
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -52,8 +71,8 @@ class DMFFragment : Fragment() {
     private var mParam1: String? = null
     private var mParam2: String? = null
 
-    private var smallChart: LineChart? = null
-    private var fundSeekBar: SeekBar? = null
+    private lateinit var smallChart: LineChart
+    private lateinit var fundSeekBar: SeekBar
     private lateinit var fundSeekBarTitleTx: TextView
     private lateinit var cashPercentageTx: TextView
     private lateinit var fundPercentageTx: TextView
@@ -73,6 +92,8 @@ class DMFFragment : Fragment() {
     private var toStrategy = ""
     private var transferRedeemAMount = ""
 
+    private lateinit var decimalFormat: DecimalFormat
+
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +102,12 @@ class DMFFragment : Fragment() {
             mParam1 = arguments.getString(ARG_PARAM1)
             mParam2 = arguments.getString(ARG_PARAM2)
         }
+
+        val locale = Locale("en", "AU")
+        val pattern = "###,###.##"
+
+        decimalFormat = NumberFormat.getNumberInstance(locale) as DecimalFormat
+        decimalFormat.applyPattern(pattern)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -93,17 +120,21 @@ class DMFFragment : Fragment() {
         fundPercentageTx = view.findViewById(R.id.fund_percentage)
 
         smallChart = view.findViewById(R.id.smallChart)
-        smallChart!!.setOnLongClickListener({ _ ->
-            val intent = Intent(activity, ChartActivity::class.java)
-            activity.startActivity(intent)
-
-            true
+        var count = 0
+        smallChart.setOnClickListener({
+            count++
+            Handler().postDelayed({
+                if (count == 2) {
+                    val intent = Intent(activity, ChartActivity::class.java)
+                    activity.startActivity(intent)
+                }
+                count = 0
+            }, 500)
         })
-        setData(10, 800f)
 
         this.fundSeekBar = view.findViewById(R.id.fund_seek_bar)
-        this.fundSeekBar!!.incrementProgressBy(1)
-        this.fundSeekBar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        this.fundSeekBar.incrementProgressBy(1)
+        this.fundSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {
@@ -213,6 +244,8 @@ class DMFFragment : Fragment() {
                 redeemAmountEditText = dialog.customView!!.findViewById(R.id.redeem_amount_text)
             }
         })
+
+        checkHistoryFile()
 
         return view
     }
@@ -361,7 +394,106 @@ class DMFFragment : Fragment() {
         RxBus.Companion.get().unRegister(this)
     }
 
-    private fun setData(count: Int, range: Float) {
+    private fun renderChart() {
+        // if disabled, scaling can be done on x- and y-axis separately
+        smallChart.setPinchZoom(true)
+        //add data
+        setData()
+
+        val dates = ArrayList<Date>()
+        for (idx in 0 until FundsDataManager.dmfHistoryData.size) {
+            val o = FundsDataManager.dmfHistoryData[idx]
+            dates.add(dateFormatShort.parse(o.HistoryDate!!))
+        }
+
+        smallChart.axisLeft.setDrawLabels(false)
+        smallChart.axisRight.setDrawLabels(false)
+        smallChart.description = null
+        smallChart.legend.formToTextSpace = 2f
+        smallChart.legend.xEntrySpace = 24f
+
+        //get the legend (only possible after setting data)
+        val legend = smallChart.legend
+        legend.form = Legend.LegendForm.SQUARE
+        legend.textSize = 11f
+        legend.textColor = Color.DKGRAY
+        legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+        legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+        legend.orientation = Legend.LegendOrientation.HORIZONTAL
+        legend.setDrawInside(false)
+
+        val xAxis = smallChart.xAxis
+        xAxis.textSize = 11f
+        xAxis.textColor = Color.DKGRAY
+        xAxis.granularity = 1.0f
+        xAxis.setLabelCount(minOf(dates.size, 10), true)
+        xAxis.setAvoidFirstLastClipping(true)
+        xAxis.valueFormatter = ChartXAxisValueFormatter(dates)
+
+        smallChart.animateX(1500)
+    }
+
+    private fun getHistoryDataEntries(): ArrayList<Entry> {
+        val data = FundsDataManager.dmfHistoryData
+        var dataEntries: ArrayList<Entry> = ArrayList()
+        for (idx in 0 until data.size) {
+            val o = data[idx]
+            val totalFundInvested = o.Capital!!.toFloat() * 1000000
+            val gross = o.Gross!!.toFloat()
+            val grossInvest = totalFundInvested + gross
+            val fees = o.FeeT!!.toFloat()
+            val netInvest = grossInvest - fees
+            dataEntries.add(Entry(idx.toFloat(), netInvest))
+        }
+        return dataEntries
+    }
+
+    private fun getFeeDataEntries(): ArrayList<Entry> {
+        val data = FundsDataManager.dmfHistoryData
+        var dataEntries: ArrayList<Entry> = ArrayList()
+        for (idx in 0 until data.size) {
+            val o = data[idx]
+            dataEntries.add(Entry(idx.toFloat(), o.FeeT!!.toFloat()))
+        }
+
+        return dataEntries
+    }
+
+    private fun setData() {
+        val dataSetL: LineDataSet
+        val dataSetR: LineDataSet
+
+        if (smallChart.data != null && smallChart.data.dataSetCount > 0) {
+            dataSetL = smallChart.data.getDataSetByIndex(0) as LineDataSet
+            dataSetR = smallChart.data.getDataSetByIndex(1) as LineDataSet
+            dataSetL.values = getHistoryDataEntries()
+            dataSetR.values = getFeeDataEntries()
+            smallChart.data.notifyDataChanged()
+            smallChart.notifyDataSetChanged()
+        } else {
+            // create a dataSet and give it a type
+            dataSetL = LineDataSet(getHistoryDataEntries(), "Net Investment Value")
+            dataSetL.axisDependency = YAxis.AxisDependency.LEFT
+            dataSetL.color = Color.DKGRAY
+            dataSetL.lineWidth = 1.0f
+            dataSetL.setDrawCircles(false)
+
+            dataSetR = LineDataSet(getFeeDataEntries(), "Fees")
+            dataSetR.axisDependency = YAxis.AxisDependency.RIGHT
+            dataSetR.color = ContextCompat.getColor(activity.applicationContext, R.color.colorAccent)
+            dataSetR.enableDashedLine(10f, 5f, 0f)
+            dataSetR.enableDashedHighlightLine(10f, 5f, 0f)
+            dataSetR.lineWidth = 1.0f
+            dataSetR.setDrawCircles(false)
+
+            val lineData = LineData(dataSetL, dataSetR)
+            lineData.setDrawValues(false)
+
+            //set data
+            smallChart.data = lineData
+        }
+
+        /*
 
         val values = ArrayList<Entry>()
 
@@ -397,13 +529,7 @@ class DMFFragment : Fragment() {
             set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
             set1.formSize = 15f
 
-//            if (Utils.getSDKInt() >= 18) {
-//                // fill drawable only supported on api level 18 and above
-//                val drawable = ContextCompat.getDrawable(this, R.drawable.fade_red)
-//                set1.fillDrawable = drawable
-//            } else {
             set1.fillColor = Color.BLACK
-//            }
 
             val dataSets = ArrayList<ILineDataSet>()
             dataSets.add(set1) // add the datasets
@@ -414,12 +540,165 @@ class DMFFragment : Fragment() {
             // set data
             smallChart!!.data = data
         }
+        */
     }
 
     private fun hasPin(): Boolean {
         val user = User().queryFirst()
         return user!!.pin != 0
     }
+
+    // load data
+    private fun checkHistoryFile() {
+        DynamoDBManager.checkHistoryDataUploadTimestamp({
+            loadHistoryData()
+        }, {
+            if (FundsDataManager.dmfHistoryData.isEmpty()) {
+                loadHistoryData()
+            } else {
+                //use existing data in memory
+                updateHistoryDataDisplay(FundsDataManager.dmfHistoryData, false)
+            }
+        })
+    }
+
+    private fun loadHistoryData() {
+        DynamoDBManager.getUserHistoryData({ historyData ->
+            updateHistoryDataDisplay(historyData, true)
+        }, {
+            activity.alert("Oops", "Failed to load capital data.")
+        })
+    }
+
+    private fun updateHistoryDataDisplay(historyData: ArrayList<DynamoDBManager.DDDMFUserDataHistoryFromS3TableRow>, needToKeep: Boolean = false) {
+        if (needToKeep) {
+            FundsDataManager.dmfHistoryData = historyData
+        }
+
+        renderChart()
+
+        val o = historyData.last()
+        val latestDateString = o.HistoryDate
+        val lastDate = dateFormatShort.parse(latestDateString)
+        dmfHeaderUpdateTx.text = "Last Update: " + dateFormatLong.format(lastDate)
+
+        if (o.Capital!!.toDouble() < 0.01) {
+            strategyBtnTx.text = "Core"
+            fundStrategy = "Core"
+            dmfHeaderStrategyTx.text = "Strategy: Core"
+        } else {
+            val factor = o.Risk!!.toDouble() / o.Capital!!.toDouble()
+            when {
+                factor >= 5.0 -> {
+                    strategyBtnTx.text = "Aggressive"
+                    fundStrategy = "Aggressive"
+                    dmfHeaderStrategyTx.text = "Strategy: Aggressive"
+                }
+                factor > 1.5 -> {
+                    strategyBtnTx.text = "Growth"
+                    fundStrategy = "Growth"
+                    dmfHeaderStrategyTx.text = "Strategy: Growth"
+                }
+                else -> {
+                    strategyBtnTx.text = "Core"
+                    fundStrategy = "Core"
+                    dmfHeaderStrategyTx.text = "Strategy: Core"
+                }
+            }
+        }
+
+        val totalFundInvested = o.Capital!!.toDouble() * 1000000
+        val totalFundInvestedValue = "AUD +$" + decimalFormat.format(totalFundInvested)
+        dmfTotalFundInvestedTx.text = totalFundInvestedValue
+        val gross = o.Gross!!.toDouble()
+        val grossValue = "AUD +$" + decimalFormat.format(gross)
+        dmfGrossPerformanceTx.text = grossValue
+        val grossInvest = totalFundInvested + gross
+        val grossInvestValue = "AUD +$" + decimalFormat.format(grossInvest)
+        dmfGrossInvestValueTx.text = grossInvestValue
+
+        val fees = o.FeeT!!.toDouble()
+        val feesValue = "AUD -$" + decimalFormat.format(fees)
+        dmfFeeTx.text = feesValue
+        val netInvest = grossInvest - fees
+        val netInvestValue = "AUD +$" + decimalFormat.format(netInvest)
+        dmfNetInvestValueTx.text = netInvestValue
+
+        dmfHeaderInvestValueTx.text = "Net Investment Value: " + netInvestValue
+
+        checkAssetsFile()
+    }
+
+    private fun checkAssetsFile() {
+        DynamoDBManager.checkAssetDataUploadTimestamp({
+            loadAssetsData()
+        }, {
+            if (FundsDataManager.dmfAssetsData.isEmpty()) {
+                loadAssetsData()
+            } else {
+                updateAssetsDataDisplay(FundsDataManager.dmfAssetsData, false)
+            }
+        })
+    }
+
+    private fun loadAssetsData() {
+        DynamoDBManager.getUserAssetData({ assetsData ->
+            updateAssetsDataDisplay(assetsData, true)
+        }, {
+            activity.alert("Oops", "Failed to load assets data.")
+        })
+    }
+
+    private fun updateAssetsDataDisplay(assetsData: ArrayList<DynamoDBManager.DDDMFUserDataAssetFromS3TableRow>, needToKeep: Boolean = false) {
+        if (needToKeep) {
+            FundsDataManager.dmfAssetsData = assetsData
+        }
+
+        var totalAudExposure = 0.0
+        var equity = 0.0
+        var bond = 0.0
+        var shortbond = 0.0
+        var energy = 0.0
+        var fx = 0.0
+        var precious = 0.0
+        var agri = 0.0
+        var cash = 0.0
+
+        for (o in assetsData) {
+            val delta = o.AudExposure!!.toDouble()
+            totalAudExposure += delta
+            when (o.Asset) {
+                "bond" -> bond += delta
+                "equity" -> equity += delta
+                "shortbond" -> shortbond += delta
+                "energy" -> energy += delta
+                "fx" -> fx += delta
+                "precious" -> precious += delta
+                "cash" -> cash += delta
+                "agri" -> agri += delta
+                else -> println("null")
+            }
+        }
+
+        if (assetsData.size > 0) {
+            val cashValue = decimalFormat.format((cash / totalAudExposure) * 100) + "%"
+            dmfExpCashTx.text = cashValue
+            val equityValue = decimalFormat.format((equity / totalAudExposure) * 100) + "%"
+            dmfExpEquityTx.text = equityValue
+            val bondValue = decimalFormat.format((bond / totalAudExposure) * 100) + "%"
+            dmfExpBondTx.text = bondValue
+            val shortbondValue = decimalFormat.format((shortbond / totalAudExposure) * 100) + "%"
+            dmfExpShortBondTx.text = shortbondValue
+            val fxValue = decimalFormat.format((fx / totalAudExposure) * 100) + "%"
+            dmfExpFxTx.text = fxValue
+            val preciousValue = decimalFormat.format((precious / totalAudExposure) * 100) + "%"
+            dmfExpMetalTx.text = preciousValue
+            val agriValue = decimalFormat.format((agri / totalAudExposure) * 100) + "%"
+            dmfExpAgriTx.text = agriValue
+        }
+
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -438,6 +717,8 @@ class DMFFragment : Fragment() {
     companion object {
 
         private val REQUEST_CODE = 4
+        private val dateFormatShort = SimpleDateFormat("yyyyMMdd")
+        private val dateFormatLong = SimpleDateFormat("EEEE, MMMM dd, yyyy")
 
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

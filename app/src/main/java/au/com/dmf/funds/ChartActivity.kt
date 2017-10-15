@@ -10,11 +10,17 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.android.synthetic.main.activity_chart.*
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import android.graphics.DashPathEffect
 import android.graphics.PorterDuff
+import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.view.MenuItem
+import au.com.dmf.data.FundsDataManager
+import au.com.dmf.utils.ChartXAxisValueFormatter
+import au.com.dmf.utils.ChartYAxisValueFormatter
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.YAxis
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -44,6 +50,9 @@ class ChartActivity : AppCompatActivity() {
     }
     private var mVisible: Boolean = false
     private val mHideRunnable = Runnable { hide() }
+
+    private var count = 0
+
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
@@ -71,14 +80,210 @@ class ChartActivity : AppCompatActivity() {
         mVisible = true
 
         // Set up the user interaction to manually show or hide the system UI.
-        fullscreen_content.setOnClickListener { toggle() }
+        //fullscreen_content.setOnClickListener { toggle() }
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        dummy_button.setOnTouchListener(mDelayHideTouchListener)
+        //dummy_button.setOnTouchListener(mDelayHideTouchListener)
 
-        setData(100, 1000f)
+        renderChart()
+
+    }
+
+    private fun renderChart() {
+        // if disabled, scaling can be done on x- and y-axis separately
+        largeChart.setPinchZoom(true)
+        //add data
+        setData()
+
+        val dates = ArrayList<Date>()
+        for (idx in 0 until FundsDataManager.dmfHistoryData.size) {
+            val o = FundsDataManager.dmfHistoryData[idx]
+            dates.add(dateFormatShort.parse(o.HistoryDate!!))
+        }
+
+        largeChart.description = null
+        largeChart.legend.formToTextSpace = 2f
+        largeChart.legend.xEntrySpace = 24f
+        largeChart.xAxis.granularity = 1.0f
+        largeChart.xAxis.setLabelCount(minOf(dates.size, 16), true)
+        largeChart.xAxis.setAvoidFirstLastClipping(true)
+
+        largeChart.animateX(2000)
+
+        //get the legend (only possible after setting data)
+        val legend = largeChart.legend
+        legend.form = Legend.LegendForm.SQUARE
+        legend.textSize = 11f
+        legend.textColor = Color.DKGRAY
+        legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+        legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+        legend.orientation = Legend.LegendOrientation.HORIZONTAL
+        legend.setDrawInside(false)
+
+        val xAxis = largeChart.xAxis
+        xAxis.textSize = 11f
+        xAxis.textColor = Color.DKGRAY
+        xAxis.valueFormatter = ChartXAxisValueFormatter(dates)
+        //xAxis.setDrawGridLines(false)
+        //xAxis.setDrawAxisLine(false)
+
+        val leftAxis = largeChart.axisLeft
+        leftAxis.textSize = 11f
+        leftAxis.textColor = Color.DKGRAY
+        leftAxis.mAxisMaximum = getLeftAxisMax()
+        leftAxis.mAxisMinimum = getLeftAxisMin()
+        leftAxis.setDrawGridLines(true)
+        leftAxis.isGranularityEnabled = true
+        leftAxis.valueFormatter = ChartYAxisValueFormatter()
+
+        val rightAxis = largeChart.axisRight
+        rightAxis.textSize = 11f
+        rightAxis.textColor = ContextCompat.getColor(this.applicationContext, R.color.colorAccent)
+        rightAxis.mAxisMaximum = getRightAxisMax()
+        rightAxis.mAxisMinimum = getRightAxisMin()
+        rightAxis.setDrawGridLines(true)
+        rightAxis.isGranularityEnabled = false
+        rightAxis.valueFormatter = ChartYAxisValueFormatter()
+    }
+
+    private fun getHistoryDataEntries(): ArrayList<Entry> {
+        val data = FundsDataManager.dmfHistoryData
+        var dataEntries: ArrayList<Entry> = ArrayList()
+        for (idx in 0 until data.size) {
+            val o = data[idx]
+            val totalFundInvested = o.Capital!!.toFloat() * 1000000
+            val gross = o.Gross!!.toFloat()
+            val grossInvest = totalFundInvested + gross
+            val fees = o.FeeT!!.toFloat()
+            val netInvest = grossInvest - fees
+            dataEntries.add(Entry(idx.toFloat(), netInvest))
+        }
+        return dataEntries
+    }
+
+    private fun getFeeDataEntries(): ArrayList<Entry> {
+        val data = FundsDataManager.dmfHistoryData
+        var dataEntries: ArrayList<Entry> = ArrayList()
+        for (idx in 0 until data.size) {
+            val o = data[idx]
+            dataEntries.add(Entry(idx.toFloat(), o.FeeT!!.toFloat()))
+        }
+
+        return dataEntries
+    }
+
+    private fun getLeftAxisMax(): Float {
+        val data = FundsDataManager.dmfHistoryData
+        val o = data.first()
+        val totalFundInvested = o.Capital!!.toFloat() * 1000000
+        val gross = o.Gross!!.toFloat()
+        val grossInvest = totalFundInvested + gross
+        val fees = o.FeeT!!.toFloat()
+        val netInvest = grossInvest - fees
+
+        var maxed = netInvest
+        for (i in 1 until data.size) {
+            val obj = data[i]
+            val oTotalFundInvested = obj.Capital!!.toFloat() * 1000000
+            val oGross = obj.Gross!!.toFloat()
+            val oGrossInvest = oTotalFundInvested + oGross
+            val oFees = obj.FeeT!!.toFloat()
+            val oNetInvest = oGrossInvest - oFees
+
+            if (maxed <= oNetInvest) {
+                maxed = oNetInvest
+            }
+        }
+
+        return maxed
+    }
+    private fun getLeftAxisMin(): Float {
+        val data = FundsDataManager.dmfHistoryData
+        val o = data.first()
+        val totalFundInvested = o.Capital!!.toFloat() * 1000000
+        val gross = o.Gross!!.toFloat()
+        val grossInvest = totalFundInvested + gross
+        val fees = o.FeeT!!.toFloat()
+        val netInvest = grossInvest - fees
+
+        var mined = netInvest
+        for (i in 1 until data.size) {
+            val obj = data[i]
+            val oTotalFundInvested = obj.Capital!!.toFloat() * 1000000
+            val oGross = obj.Gross!!.toFloat()
+            val oGrossInvest = oTotalFundInvested + oGross
+            val oFees = obj.FeeT!!.toFloat()
+            val oNetInvest = oGrossInvest - oFees
+
+            if (mined >= oNetInvest) {
+                mined = oNetInvest
+            }
+        }
+
+        return mined
+    }
+
+    private fun getRightAxisMax(): Float {
+        val data = FundsDataManager.dmfHistoryData
+        var maxed = data.first().FeeT!!.toFloat()
+        for (i in 1 until data.size) {
+            val fee = data[i].FeeT!!.toFloat()
+            if (maxed <= fee) {
+                maxed = fee
+            }
+        }
+
+        return maxed
+    }
+    private fun getRightAxisMin(): Float {
+        val data = FundsDataManager.dmfHistoryData
+        var mined = data.first().FeeT!!.toFloat()
+        for (i in 1 until data.size) {
+            val fee = data[i].FeeT!!.toFloat()
+            if (mined >= fee) {
+                mined = fee
+            }
+        }
+
+        return mined
+    }
+
+
+    private fun setData() {
+        val dataSetL: LineDataSet
+        val dataSetR: LineDataSet
+
+        if (largeChart.data != null && largeChart.data.dataSetCount > 0) {
+            dataSetL = largeChart.data.getDataSetByIndex(0) as LineDataSet
+            dataSetR = largeChart.data.getDataSetByIndex(1) as LineDataSet
+            dataSetL.values = getHistoryDataEntries()
+            dataSetR.values = getFeeDataEntries()
+            largeChart.data.notifyDataChanged()
+            largeChart.notifyDataSetChanged()
+        } else {
+            // create a dataSet and give it a type
+            dataSetL = LineDataSet(getHistoryDataEntries(), "Net Investment Value")
+            dataSetL.axisDependency = YAxis.AxisDependency.LEFT
+            dataSetL.color = Color.DKGRAY
+            dataSetL.lineWidth = 2.0f
+            dataSetL.setDrawCircles(false)
+
+            dataSetR = LineDataSet(getFeeDataEntries(), "Fees")
+            dataSetR.axisDependency = YAxis.AxisDependency.RIGHT
+            dataSetR.color = ContextCompat.getColor(this.applicationContext, R.color.colorAccent)
+            dataSetR.enableDashedLine(8f, 5f, 0f)
+            dataSetR.enableDashedHighlightLine(10f, 5f, 0f)
+            dataSetR.lineWidth = 2.0f
+            dataSetR.setDrawCircles(false)
+
+            val lineData = LineData(dataSetL, dataSetR)
+            lineData.setDrawValues(false)
+
+            //set data
+            largeChart.data = lineData
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -92,60 +297,7 @@ class ChartActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setData(count: Int, range: Float) {
 
-        val values = ArrayList<Entry>()
-
-        for (i in 0 until count) {
-            val `val` = (Math.random() * range).toFloat() + 3
-            values.add(Entry(i.toFloat(), `val`))
-        }
-
-        val set1: LineDataSet
-
-        if (largeChart.data!= null && largeChart.data.dataSetCount > 0) {
-            set1 = largeChart.data.getDataSetByIndex(0) as LineDataSet
-            set1.values = values
-            largeChart.getData().notifyDataChanged()
-            largeChart.notifyDataSetChanged()
-        } else {
-            // create a dataset and give it a type
-            set1 = LineDataSet(values, "DataSet 1")
-
-            set1.setDrawIcons(false)
-
-            // set the line to be drawn like this "- - - - - -"
-            set1.enableDashedLine(10f, 5f, 0f)
-            set1.enableDashedHighlightLine(10f, 5f, 0f)
-            set1.color = Color.BLACK
-            set1.setCircleColor(Color.BLACK)
-            set1.lineWidth = 1f
-            set1.circleRadius = 3f
-            set1.setDrawCircleHole(false)
-            set1.valueTextSize = 9f
-            set1.setDrawFilled(false)
-            set1.formLineWidth = 1f
-            set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            set1.formSize = 15f
-
-//            if (Utils.getSDKInt() >= 18) {
-//                // fill drawable only supported on api level 18 and above
-//                val drawable = ContextCompat.getDrawable(this, R.drawable.fade_red)
-//                set1.fillDrawable = drawable
-//            } else {
-            set1.fillColor = Color.BLACK
-//            }
-
-            val dataSets = ArrayList<ILineDataSet>()
-            dataSets.add(set1) // add the datasets
-
-            // create a data object with the datasets
-            val data = LineData(dataSets)
-
-            // set data
-            largeChart.data = data
-        }
-    }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
@@ -197,6 +349,9 @@ class ChartActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        private val dateFormatShort = SimpleDateFormat("yyyyMMdd")
+
         /**
          * Whether or not the system UI should be auto-hidden after
          * [AUTO_HIDE_DELAY_MILLIS] milliseconds.

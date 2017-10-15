@@ -7,9 +7,12 @@
     <TextView
         android:id="@+id/notification_top_bar"
         android:layout_width="match_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_height="40dp"
-        android:paddingTop="10dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/colorWhite"
         android:paddingLeft="10dp"
+        android:text="Checking..."
         android:background="@color/colorSoftBlue"/>
 
     <android.support.v4.view.ViewPager

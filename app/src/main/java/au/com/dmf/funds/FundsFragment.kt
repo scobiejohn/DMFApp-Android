@@ -51,7 +51,7 @@ class FundsFragment : Fragment() {
 
         val view = inflater!!.inflate(R.layout.fragment_funds, container, false)
 
-        var viewPagerAdapter = FundFragmentAdapter(childFragmentManager)
+        val viewPagerAdapter = FundFragmentAdapter(childFragmentManager)
         val viewPager = view.findViewById<ViewPager>(R.id.viewPager)
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {

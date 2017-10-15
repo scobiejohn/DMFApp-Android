@@ -17,6 +17,9 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.vicpin.krealmextensions.queryFirst
 import com.vicpin.krealmextensions.save
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator
+import com.amazonaws.services.dynamodbv2.model.Condition
+
 
 object DynamoDBManager {
 
@@ -87,18 +90,23 @@ object DynamoDBManager {
                 .withHashKeyValues(row)
         doAsync {
             val result = mapper.query(DDDMFUserHistoryUploadedTableRow::class.java, queryExpression) as PaginatedList<DDDMFUserHistoryUploadedTableRow>
-            println("RESULT : $result")
             try {
                 val timestamp = result[0].HistoryTimestamp!!.toInt()
                 if (user.historyDataTimestamp != timestamp) {
                     user.historyDataTimestamp = timestamp
                     user.save()
-                    success()
+                    uiThread {
+                        success()
+                    }
                     return@doAsync
                 }
-                failure()
+                uiThread {
+                    failure()
+                }
             }catch (ex: Exception){
-                failure()
+                uiThread {
+                    failure()
+                }
             }
         }
     }
@@ -112,18 +120,25 @@ object DynamoDBManager {
                 .withHashKeyValues(row)
         doAsync {
             val result = mapper.query(DDDMFUserAssetUploadedTableRow::class.java, queryExpression) as PaginatedList<DDDMFUserAssetUploadedTableRow>
-            println("RESULT : $result")
             try {
                 val assetDate = result[0].AssetDate
+                println(assetDate)
+                println(user.assetDate)
                 if (user.assetDate != assetDate) {
                     user.assetDate = assetDate!!
                     user.save()
-                    success()
+                    uiThread {
+                        success()
+                    }
                     return@doAsync
                 }
-                failure()
+                uiThread {
+                    failure()
+                }
             }catch (ex: Exception){
-                failure()
+                uiThread {
+                    failure()
+                }
             }
         }
     }
@@ -155,20 +170,17 @@ object DynamoDBManager {
     fun getUserHistoryData(success: (ArrayList<DDDMFUserDataHistoryFromS3TableRow>) -> Unit, failure: () -> Unit) {
         val user = User().queryFirst()
         val userFileName = user!!.fundFile
-        val mapper = DynamoDBMapper(ddb)
 
         val row = DDDMFUserDataHistoryFromS3TableRow()
         row.UserFileName = userFileName
         val queryExpression = DynamoDBQueryExpression<DDDMFUserDataHistoryFromS3TableRow>()
                 .withHashKeyValues(row)
-        queryExpression.limit = 10
-        queryExpression.isScanIndexForward = false
+                .withScanIndexForward(false)
         doAsync {
             val result = mapper.queryPage(DDDMFUserDataHistoryFromS3TableRow::class.java, queryExpression)
-            println("RESULT : $result")
-
-            //val sortedList = list.sortedWith(compareBy(Person::age, Person::name))
-            success(ArrayList(result.results.sortedWith(compareBy( { it.HistoryDate }))))
+            uiThread {
+                success(ArrayList(result.results.sortedWith(compareBy( { it.HistoryDate }))))
+            }
         }
     }
 
@@ -176,6 +188,37 @@ object DynamoDBManager {
         val user = User().queryFirst()
         val userFileName = user!!.fundFile
         val assetDate = user!!.assetDate
+        val row = DDDMFUserDataAssetFromS3TableRow()
+        row.UserFileName = userFileName
+
+        val expressionAttributesNames: HashMap<String,String> = HashMap()
+        expressionAttributesNames.put("#AssetDate", "AssetDate")
+
+        val expressionAttributeValues: HashMap<String,AttributeValue> = HashMap()
+        expressionAttributeValues.put(":AssetDate", AttributeValue().withS(assetDate))
+
+        val keyCondition = Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(AttributeValue().withS(assetDate))
+        val queryExpression = DynamoDBQueryExpression<DDDMFUserDataAssetFromS3TableRow>()
+                .withHashKeyValues(row)
+                .withIndexName("UserFileName-AssetDate-index")
+                .withRangeKeyCondition("AssetDate", keyCondition)
+                .withConsistentRead(false)
+
+        doAsync {
+            try {
+                val result = mapper.queryPage(DDDMFUserDataAssetFromS3TableRow::class.java, queryExpression)
+                uiThread {
+                    success(ArrayList(result.results))
+                }
+            } catch (ex: AmazonServiceException) {
+                println(ex)
+                uiThread {
+                    failure()
+                }
+            }
+
+        }
+
     }
 
     fun getNotifications(limit: Int, success: (ArrayList<DMFNotificationTableRow>) -> Unit, failure: () -> Unit) {
@@ -228,9 +271,9 @@ object DynamoDBManager {
     class DDDMFUserDataAssetFromS3TableRow {
         @get:DynamoDBHashKey(attributeName = "Id")
         var Id: String? = ""
-        @get:DynamoDBAttribute(attributeName = "AssetDate")
+        @get:DynamoDBIndexRangeKey(attributeName = "AssetDate", globalSecondaryIndexName = "UserFileName-AssetDate-index")
         var AssetDate: String? = ""
-        @get:DynamoDBAttribute(attributeName = "UserFileName")
+        @get:DynamoDBIndexHashKey(attributeName = "UserFileName", globalSecondaryIndexName = "UserFileName-AssetDate-index")
         var UserFileName: String? = ""
         @get:DynamoDBAttribute(attributeName = "Asset")
         var Asset: String? = ""
