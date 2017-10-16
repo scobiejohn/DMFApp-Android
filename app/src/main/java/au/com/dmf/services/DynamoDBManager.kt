@@ -74,9 +74,14 @@ object DynamoDBManager {
         doAsync {
             try {
                 val result = mapper.query(DMFFundsTableRow::class.java, queryExpression) as PaginatedList<DMFFundsTableRow>
-                success(result.first())
+                uiThread {
+                    success(result.first())
+                }
+
             } catch (ex: Exception) {
-                failure()
+                uiThread {
+                    failure()
+                }
             }
         }
     }

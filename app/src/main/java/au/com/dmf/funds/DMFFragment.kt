@@ -41,6 +41,7 @@ import au.com.dmf.events.GetFundStateEvent
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.ChartXAxisValueFormatter
 import au.com.dmf.utils.ChartYAxisValueFormatter
+import au.com.dmf.utils.Util
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.ChartData
@@ -155,11 +156,9 @@ class DMFFragment : Fragment() {
 
                 MaterialDialog.Builder(activity)
                         .title("Multiplier")
+                        .content("Choose the amount of leverage to apply to your portfolio.")
                         .items(R.array.fundMultipliers)
                         .itemsCallbackSingleChoice(-1, { dialog, view, which, text ->
-
-                            println(which)
-                            println(text)
 
                             if (text != this.fundStrategy) {
                                 this.toStrategy = text.toString()
@@ -246,6 +245,11 @@ class DMFFragment : Fragment() {
         })
 
         checkHistoryFile()
+
+        if (FundsDetail.fundUpdated) {
+            FundsDetail.fundUpdated = false
+            updateFundModeDisplay()
+        }
 
         return view
     }
@@ -335,7 +339,7 @@ class DMFFragment : Fragment() {
 
     private fun displayValueForExtreme(value: Int, forCash: Boolean = true): String {
         val updatedValue = 100 - value * 20
-        var displayValue = updatedValue.toString()
+        var displayValue: String
         if (updatedValue == 0) {
             if (forCash) {
                 displayValue = "Min"
@@ -344,10 +348,12 @@ class DMFFragment : Fragment() {
             }
         } else if (updatedValue == 100) {
             if (forCash) {
-                displayValue = "Max"
-            } else {
                 displayValue = "100"
+            } else {
+                displayValue = "Max"
             }
+        } else {
+            displayValue = updatedValue.toString()
         }
 
         return displayValue
@@ -381,11 +387,23 @@ class DMFFragment : Fragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onGetFundStateEvent(evt: GetFundStateEvent) {
+        updateFundModeDisplay()
+    }
+
+    private fun updateFundModeDisplay() {
         val fundIno = FundsDetail.funds.get("Darling Macro Fund")
         if (fundIno != null) {
             println(fundIno.investable)
             transferBtnTx.isEnabled = fundIno.investable != "NO"
             transferBtnTx.alpha = if (fundIno.investable != "NO") 1.0f else 0.3f
+
+            if (fundIno.inMarket == "NO") {
+                fundSeekBar.isEnabled = false
+                fundSeekBar.alpha = 0.5f
+                cashPercentageTx.alpha = 0.5f
+                fundPercentageTx.alpha = 0.5f
+                fundSeekBarTitleTx.text = "Fund Mode: Passive"
+            }
         }
     }
 
@@ -492,55 +510,6 @@ class DMFFragment : Fragment() {
             //set data
             smallChart.data = lineData
         }
-
-        /*
-
-        val values = ArrayList<Entry>()
-
-        for (i in 0 until count) {
-            val `val` = (Math.random() * range).toFloat() + 3
-            values.add(Entry(i.toFloat(), `val`))
-        }
-
-        val set1: LineDataSet
-
-        if (smallChart?.data != null && smallChart!!.data.dataSetCount > 0) {
-            set1 = smallChart!!.data.getDataSetByIndex(0) as LineDataSet
-            set1.values = values
-            smallChart!!.data.notifyDataChanged()
-            smallChart!!.notifyDataSetChanged()
-        } else {
-            // create a dataset and give it a type
-            set1 = LineDataSet(values, "DataSet 1")
-
-            set1.setDrawIcons(false)
-
-            // set the line to be drawn like this "- - - - - -"
-            set1.enableDashedLine(10f, 5f, 0f)
-            set1.enableDashedHighlightLine(10f, 5f, 0f)
-            set1.color = Color.BLACK
-            set1.setCircleColor(Color.BLACK)
-            set1.lineWidth = 1f
-            set1.circleRadius = 3f
-            set1.setDrawCircleHole(false)
-            set1.valueTextSize = 9f
-            set1.setDrawFilled(false)
-            set1.formLineWidth = 1f
-            set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            set1.formSize = 15f
-
-            set1.fillColor = Color.BLACK
-
-            val dataSets = ArrayList<ILineDataSet>()
-            dataSets.add(set1) // add the datasets
-
-            // create a data object with the datasets
-            val data = LineData(dataSets)
-
-            // set data
-            smallChart!!.data = data
-        }
-        */
     }
 
     private fun hasPin(): Boolean {
@@ -625,6 +594,19 @@ class DMFFragment : Fragment() {
         dmfNetInvestValueTx.text = netInvestValue
 
         dmfHeaderInvestValueTx.text = "Net Investment Value: " + netInvestValue
+        dmfMyHoldingsTx.text = "My Holdings = $" + decimalFormat.format(netInvest)
+
+        // Cash Fund Acc
+        val s = if (gross > 0) (gross / (gross + totalFundInvested)) else 0.0
+        val fundValue = Util.steppedNumber(1.0, s)
+        val cashAccValue = 5 - fundValue
+        seekBarProgress = cashAccValue
+        val cashLabel = displayValueForExtreme(cashAccValue, true) + "%"
+        val fundLabel = displayValueForExtreme(fundValue, false) + "%"
+        cashPercentageTx.text = cashLabel
+        fundPercentageTx.text = fundLabel
+        fundSeekBarTitleTx.text = "Funds In Cash : $cashLabel\nFunds In DMF : $fundLabel"
+        fundSeekBar.progress = seekBarProgress
 
         checkAssetsFile()
     }

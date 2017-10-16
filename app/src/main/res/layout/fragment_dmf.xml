@@ -394,7 +394,7 @@
 
             <TextView
                 android:layout_marginTop="10dp"
-                android:id="@+id/dmfMyholdingsTx"
+                android:id="@+id/dmfMyHoldingsTx"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorPrimaryDark"

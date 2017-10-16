@@ -24,8 +24,13 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import android.R.array
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
+import au.com.dmf.data.FundInfo
+import au.com.dmf.data.FundsDetail
+import au.com.dmf.events.GetFundStateEvent
 import com.afollestad.materialdialogs.DialogAction
 import org.jetbrains.anko.support.v4.find
+import org.jetbrains.anko.toast
+import work.wanghao.rxbus2.RxBus
 
 
 /**
@@ -94,6 +99,16 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         val userGuideButton = view.findViewById<Button>(R.id.userGuideButton)
         userGuideButton.setOnClickListener(onOpenDocView)
 
+        val refreshDataButton = view.findViewById<Button>(R.id.refreshDataButton)
+        refreshDataButton.setOnClickListener {
+            DynamoDBManager.getFundDetails("Darling Macro Fund", {row ->
+                val fundInfo = FundInfo(row.InMarket!!, row.Investable!!)
+                FundsDetail.funds.put("Darling Macro Fund", fundInfo)
+                FundsDetail.fundUpdated = true
+                activity.toast("The latest data has been checked.")
+            }, {})
+        }
+
         val signOutButton = view.findViewById<Button>(R.id.signOutButton)
         signOutButton.setOnClickListener({
             AWSManager.userPool?.currentUser?.signOut()
@@ -123,25 +138,6 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         autoSignOutButton.setOnClickListener({
             openSignOutSessionDialog(user!!.sessionDuration)
         })
-
-//        DynamoDBManager.test({ list ->
-//            println(list)
-//            println(list[0].UserFileName)
-//        }, {println("FAILED")})
-
-//        DynamoDBManager.getUserHistoryData({response ->
-//            println(response)
-//        }, {})
-
-        /*
-        DynamoDBManager.checkHistoryDataUploadTimestamp({
-            val user = User().queryFirst()
-            println(user)
-            DynamoDBManager.getUserHistoryData({response ->
-                            println(response)
-        }, {})
-        }, {})
-        */
 
         return view
     }
