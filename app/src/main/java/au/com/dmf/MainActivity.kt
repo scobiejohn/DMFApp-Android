@@ -22,6 +22,8 @@ import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.settings.HtmlFileFragment
 import au.com.dmf.settings.SettingsFragment
 import au.com.dmf.tasks.TasksFragment
+import com.amazonaws.services.cognitosync.AmazonCognitoSyncClient
+import com.amazonaws.services.sns.AmazonSNSAsync
 import com.androidnetworking.AndroidNetworking
 import kotlinx.android.synthetic.main.activity_main.*
 import work.wanghao.rxbus2.RxBus
@@ -69,6 +71,15 @@ class MainActivity : AppCompatActivity(),
             FundsDetail.funds.put("Darling Macro Fund", fundInfo)
             RxBus.Companion.get().post(GetFundStateEvent())
         }, {})
+
+        if (DynamoDBManager.needRegisterFCMToken) {
+            DynamoDBManager.needRegisterFCMToken = false
+            DynamoDBManager.registerFCMToken({}, {})
+
+            DynamoDBManager.subscribeToTopic()
+        }
+
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -127,6 +138,5 @@ class MainActivity : AppCompatActivity(),
             }
         }
     }
-
 
 }

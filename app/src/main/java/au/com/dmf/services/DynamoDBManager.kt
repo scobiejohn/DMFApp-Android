@@ -6,7 +6,6 @@ import au.com.dmf.model.User
 import au.com.dmf.utils.Constants
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.auth.CognitoCredentialsProvider
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
@@ -19,17 +18,25 @@ import com.vicpin.krealmextensions.queryFirst
 import com.vicpin.krealmextensions.save
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator
 import com.amazonaws.services.dynamodbv2.model.Condition
+import com.amazonaws.services.sns.AmazonSNSClient
+import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest
+import com.amazonaws.services.sns.model.CreatePlatformEndpointResult
+import com.amazonaws.services.sns.model.SubscribeRequest
 
 
 object DynamoDBManager {
 
+    var needRegisterFCMToken = false
+    var refreshFCMToken = ""
+
     private val TAG = "DynamoDBManager"
 
     lateinit var ddb: AmazonDynamoDBClient
+    lateinit var credentials: CognitoCachingCredentialsProvider
     lateinit var mapper: DynamoDBMapper
 
     fun initClient(context: Context, logins: HashMap<String, String>) {
-        val credentials = CognitoCachingCredentialsProvider(context, Constants.COGNITO_IDENTITY_POOL_ID, Constants.COGNITO_REGIONTYPE)
+        credentials = CognitoCachingCredentialsProvider(context, Constants.COGNITO_IDENTITY_POOL_ID, Constants.COGNITO_REGIONTYPE)
         credentials.withLogins(logins)
         ddb = Region.getRegion(Regions.AP_SOUTHEAST_2) // CRUCIAL
                 .createClient(
@@ -38,6 +45,26 @@ object DynamoDBManager {
                         ClientConfiguration()
                 )
         mapper = DynamoDBMapper(ddb)
+    }
+
+    fun subscribeToTopic() {
+        val snsClient = AmazonSNSClient(credentials)
+        snsClient.setRegion(Region.getRegion(Regions.AP_SOUTHEAST_2))
+
+        val platformEndpointReq = CreatePlatformEndpointRequest()
+        platformEndpointReq.platformApplicationArn = Constants.APP_ARN
+        platformEndpointReq.token = refreshFCMToken
+
+        doAsync {
+            val createEndpointResult: CreatePlatformEndpointResult = snsClient.createPlatformEndpoint(platformEndpointReq)
+            val subscribeReq =  SubscribeRequest()
+                    .withTopicArn(Constants.TOPIC_ARN)
+                    .withProtocol("application")
+                    .withEndpoint(createEndpointResult.endpointArn)
+
+            val subscribeResult = snsClient.subscribe(subscribeReq)
+            println(subscribeResult)
+        }
     }
 
     fun wipeCredentialsOnAuthError(ex: AmazonServiceException): Boolean {
@@ -246,6 +273,18 @@ object DynamoDBManager {
         }
     }
 
+    fun registerFCMToken(success: () -> Unit, failure: () -> Unit) {
+        val user = User().queryFirst()
+        val dynamoDBMapperConfig = DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.UPDATE)
+        val obj = DMFSubscriptionTableRow()
+        obj.UserFileName = user!!.fundFile
+        obj.Token = refreshFCMToken
+        doAsync {
+            mapper.save(obj, dynamoDBMapperConfig)
+        }
+
+    }
+
     @DynamoDBTable(tableName = Constants.DMFUSERDATAHISTORYFROMS3TableName)
     class DDDMFUserDataHistoryFromS3TableRow {
         @get:DynamoDBHashKey(attributeName = "UserFileName")
@@ -336,7 +375,9 @@ object DynamoDBManager {
     class DMFSubscriptionTableRow {
         @get:DynamoDBHashKey(attributeName = "UserFileName")
         var UserFileName: String? = ""
-        @get:DynamoDBAttribute(attributeName = "EndpointArn")
-        var EndpointArn: String? = ""
+        @get:DynamoDBAttribute(attributeName = "Token")
+        var Token: String? = ""
     }
+
+
 }

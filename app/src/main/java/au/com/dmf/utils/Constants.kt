@@ -24,7 +24,6 @@ class Constants {
         const val COGNITO_DEVICE_TOKEN_KEY = "CognitoDeviceToken"
         const val COGNITO_PUSH_NOTIF = "CognitoPushNotification"
 
-
         const val AWSDynamoDBObjectMapperKey = "SP2DynamoDBObjectMapper"
 
         const val DMFUSERDATAHISTORYFROMS3TableName = "DMF_USER_DATA_CAPITAL_FROM_S3"
@@ -33,8 +32,10 @@ class Constants {
         const val DMFUSERDATAHISTORYUPLOADEDTableName = "DMF_USER_HISTORY_UPLOADED"
         const val DMFFUNDSTableName = "DMF_FUNDS"
         const val DMFNOTIFICATIONTableName = "DMF_NOTIFICATION"
-        const val DMFSUBSCRIPTIONTableName = "DMF_SUBSCRIPTION"
+        const val DMFSUBSCRIPTIONTableName = "DMF_SUBSCRIPTION_ANDROID"
 
+        const val APP_ARN = "arn:aws:sns:ap-southeast-2:821002364208:app/GCM/DMF_ANDROID_PROD"
+        const val TOPIC_ARN = "arn:aws:sns:ap-southeast-2:821002364208:DMF_ANDROID_PROD_NOTIFICATION"
 
         const val TASK_TYPE_MULTIPLIER = "Multiplier"
         const val TASK_TYPE_REDEEM = "Redeem"
