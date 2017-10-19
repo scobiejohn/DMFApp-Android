@@ -132,6 +132,9 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             pinET.setText(user!!.pin.toString())
         }
 
+        val userEmailTx = view.findViewById<TextView>(R.id.user_email_tx)
+        userEmailTx.text = user!!.name + "  " + user!!.email
+
         val autoSignOutButton = view.findViewById<Button>(R.id.auto_sign_out_session_button)
         signOutSessionTV = view.findViewById<TextView>(R.id.auto_sign_out_session_code)
         signOutSessionTV.text = autoSignOutSessionValueToLabel(user!!.sessionDuration)

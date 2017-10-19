@@ -74,8 +74,6 @@ class MainActivity : AppCompatActivity(),
 
         if (DynamoDBManager.needRegisterFCMToken) {
             DynamoDBManager.needRegisterFCMToken = false
-            DynamoDBManager.registerFCMToken({}, {})
-
             DynamoDBManager.subscribeToTopic()
         }
 

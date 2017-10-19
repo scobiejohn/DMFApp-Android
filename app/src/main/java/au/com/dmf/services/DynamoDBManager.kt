@@ -22,6 +22,8 @@ import com.amazonaws.services.sns.AmazonSNSClient
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult
 import com.amazonaws.services.sns.model.SubscribeRequest
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 object DynamoDBManager {
@@ -48,22 +50,34 @@ object DynamoDBManager {
     }
 
     fun subscribeToTopic() {
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val user = User().queryFirst()
+
         val snsClient = AmazonSNSClient(credentials)
         snsClient.setRegion(Region.getRegion(Regions.AP_SOUTHEAST_2))
 
         val platformEndpointReq = CreatePlatformEndpointRequest()
         platformEndpointReq.platformApplicationArn = Constants.APP_ARN
         platformEndpointReq.token = refreshFCMToken
+        platformEndpointReq.withCustomUserData(user!!.name + " registered at " + formatter.format(Date()))
 
         doAsync {
             val createEndpointResult: CreatePlatformEndpointResult = snsClient.createPlatformEndpoint(platformEndpointReq)
+            val endpointArn = createEndpointResult.endpointArn
             val subscribeReq =  SubscribeRequest()
                     .withTopicArn(Constants.TOPIC_ARN)
                     .withProtocol("application")
-                    .withEndpoint(createEndpointResult.endpointArn)
+                    .withEndpoint(endpointArn)
 
             val subscribeResult = snsClient.subscribe(subscribeReq)
             println(subscribeResult)
+
+
+            val dynamoDBMapperConfig = DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.UPDATE)
+            val obj = DMFSubscriptionTableRow()
+            obj.UserFileName = user!!.fundFile
+            obj.EndpointArn = endpointArn
+            mapper.save(obj, dynamoDBMapperConfig)
         }
     }
 
@@ -278,7 +292,7 @@ object DynamoDBManager {
         val dynamoDBMapperConfig = DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.UPDATE)
         val obj = DMFSubscriptionTableRow()
         obj.UserFileName = user!!.fundFile
-        obj.Token = refreshFCMToken
+        obj.EndpointArn = refreshFCMToken
         doAsync {
             mapper.save(obj, dynamoDBMapperConfig)
         }
@@ -375,8 +389,8 @@ object DynamoDBManager {
     class DMFSubscriptionTableRow {
         @get:DynamoDBHashKey(attributeName = "UserFileName")
         var UserFileName: String? = ""
-        @get:DynamoDBAttribute(attributeName = "Token")
-        var Token: String? = ""
+        @get:DynamoDBAttribute(attributeName = "EndpointArn")
+        var EndpointArn: String? = ""
     }
 
 

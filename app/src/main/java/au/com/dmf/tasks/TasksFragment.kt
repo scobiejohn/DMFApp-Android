@@ -146,7 +146,7 @@ class TasksFragment : Fragment() {
                 .content(message)
                 .positiveText("Yes")
                 .negativeText("Cancel")
-                .negativeColor(Color.DKGRAY)
+                .negativeColor(Color.GRAY)
                 .onAny { _, which ->
                     if (which == DialogAction.POSITIVE) {
                         JiraServiceManager.withdrawTicket(task.id)

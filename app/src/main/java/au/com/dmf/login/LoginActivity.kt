@@ -14,6 +14,7 @@ import au.com.dmf.model.User
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
 import au.com.dmf.utils.afterTextChanged
+import au.com.dmf.utils.alert
 import com.afollestad.materialdialogs.GravityEnum
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.Theme
@@ -67,26 +68,20 @@ class LoginActivity : AppCompatActivity() {
         }
 
         submitBtn.setOnClickListener({
-            //User("1234", "6789", 1111, "ray@mail.com", "Raymond").save()
             signIn()
         })
 
         resetPasswordButton.setOnClickListener({
             resetPassword()
         })
+        resetPasswordButton.isEnabled = false
+        resetPasswordButton.alpha = 0.2f
 
         val user = User().queryFirst()
         if (user != null && user?.pin != 0) {
             val intent = Intent(this, PinCodeActivity::class.java)
             startActivityForResult(intent, 3)
         }
-
-        /*
-        resetPasswordButton.setOnClickListener({
-            val firstUser = User().queryFirst()
-            print(firstUser)
-        })
-        */
 
     }
 
@@ -97,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
             //new password for first sign in
             (1) -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val continueSignIn = data.getBooleanExtra("continueSignIn", false)
+                    val continueSignIn = data.getBooleanExtra("continueWithSignIn", false)
                     if (continueSignIn) {
                         continueWithFirstTimeSignIn()
                     }
@@ -263,8 +258,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onFailure(exception: java.lang.Exception?) {
-            println("onFailure")
-
+            alert("Error", "Sign in failed!")
             signInPanel.visibility = View.VISIBLE
             resetPasswordButton.visibility = View.VISIBLE
             clearInputs()
