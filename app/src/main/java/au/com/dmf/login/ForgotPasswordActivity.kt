@@ -28,6 +28,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        exit("", "")
+    }
+
     private fun exit(newPass: String, code: String) {
         val intent = Intent()
         if (newPass == null || code == null) {

@@ -82,9 +82,7 @@
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:textColor="@color/colorLightGrey"
         android:backgroundTint="@color/colorWhite"
-        android:background="@android:color/transparent"
         android:layout_marginBottom="30px"
         android:text="@string/reset_password"/>
 

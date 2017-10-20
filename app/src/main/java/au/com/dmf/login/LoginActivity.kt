@@ -58,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
             userName = userNameInput.text.toString()
             password = passwordInput.text.toString()
             submitBtn.isEnabled = userName.length > 1 && password.length > 5
-            resetPasswordButton.isEnabled = userNameInput.text.toString().length > 1
+            resetPasswordButton.isEnabled = userName.length > 1
         }
 
         passwordInput.afterTextChanged {
@@ -74,8 +74,6 @@ class LoginActivity : AppCompatActivity() {
         resetPasswordButton.setOnClickListener({
             resetPassword()
         })
-        resetPasswordButton.isEnabled = false
-        resetPasswordButton.alpha = 0.2f
 
         val user = User().queryFirst()
         if (user != null && user?.pin != 0) {
