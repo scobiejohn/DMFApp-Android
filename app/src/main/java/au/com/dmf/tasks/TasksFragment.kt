@@ -19,11 +19,13 @@ import au.com.dmf.data.Task
 import au.com.dmf.services.JiraServiceManager
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
+import com.androidnetworking.AndroidNetworking
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.obj
 import com.beust.klaxon.string
 import me.dkzwm.widget.srl.MaterialSmoothRefreshLayout
 import me.dkzwm.widget.srl.RefreshingListenerAdapter
+import org.jetbrains.anko.doAsync
 import java.text.SimpleDateFormat
 
 /**
@@ -175,6 +177,9 @@ class TasksFragment : Fragment() {
     }
 
     override fun onDetach() {
+        doAsync {
+            AndroidNetworking.forceCancelAll()
+        }
         super.onDetach()
         mListener = null
     }
