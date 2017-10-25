@@ -31,7 +31,7 @@ class Constants {
         const val DMFUSERDATAASSETUPLOADEDTableName = "DMF_USER_ASSET_UPLOADED"
         const val DMFUSERDATAHISTORYUPLOADEDTableName = "DMF_USER_HISTORY_UPLOADED"
         const val DMFFUNDSTableName = "DMF_FUNDS"
-        const val DMFNOTIFICATIONTableName = "DMF_NOTIFICATION"
+        const val DMFNOTIFICATIONTableName = "DMF_NOTIFICATIONS"
         const val DMFSUBSCRIPTIONTableName = "DMF_SUBSCRIPTION_ANDROID"
 
         const val APP_ARN = "arn:aws:sns:ap-southeast-2:821002364208:app/GCM/DMF_ANDROID_PROD"

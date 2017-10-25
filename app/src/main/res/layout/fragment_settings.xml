@@ -141,6 +141,19 @@
                 android:layout_height="1dp"
                 android:background="@color/colorVeryLightGrey"/>
 
+            <Button
+                android:id="@+id/contactButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart"
+                android:backgroundTint="@color/colorWhite"
+                android:text="Contact DMF"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorVeryLightGrey"/>
+
             <android.support.v4.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="60dp" />

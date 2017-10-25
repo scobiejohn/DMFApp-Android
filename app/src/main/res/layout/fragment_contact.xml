@@ -1,0 +1,55 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    tools:context="au.com.dmf.settings.ContactFragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/contact_subject"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:padding="6dp"
+            android:scrollbars="vertical"
+            android:hint="Subject"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorVeryLightGrey"/>
+
+        <EditText
+            android:id="@+id/contact_body"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:padding="6dp"
+            android:hint="Message"
+            android:gravity="top"
+            android:scrollbars="vertical"
+            android:ems="10"
+            android:background="@android:color/transparent"
+            android:inputType="textMultiLine" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorVeryLightGrey"/>
+
+        <Button
+            android:id="@+id/contact_send_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorWhite"
+            android:enabled="false"
+            android:text="Send" />
+
+
+    </LinearLayout>
+
+</FrameLayout>

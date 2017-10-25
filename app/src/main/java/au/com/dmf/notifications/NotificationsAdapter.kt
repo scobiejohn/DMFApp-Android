@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import au.com.dmf.R
 import au.com.dmf.services.DynamoDBManager
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by raymond on 12/10/17.
@@ -14,6 +16,7 @@ import au.com.dmf.services.DynamoDBManager
 class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.NotifViewHolder>(){
 
     private var notifs: ArrayList<DynamoDBManager.DMFNotificationTableRow> = ArrayList()
+    private val timeFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     fun updateData(data: ArrayList<DynamoDBManager.DMFNotificationTableRow>) {
         notifs.clear()
@@ -23,8 +26,10 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.NotifView
 
     inner class NotifViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val messageTextView = view.findViewById<TextView>(R.id.notification_body)
+        private val timestampTextView = view.findViewById<TextView>(R.id.notification_timestamp)
         fun bindItem(notification: DynamoDBManager.DMFNotificationTableRow) {
             messageTextView.text = notification.Message
+            timestampTextView.text = timeFormatter.format(Date(notification.CreatedAt!!))
         }
     }
 

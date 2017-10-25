@@ -1,6 +1,7 @@
 package au.com.dmf.utils
 
 import android.app.Activity
+import android.app.Fragment
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
@@ -44,6 +45,9 @@ fun Activity.processing(title: String): MaterialDialog {
 }
 
 fun hideSoftKeyBoard(activity: Activity) {
-    val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
+    try {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
+    } catch (err: Exception){}
+
 }

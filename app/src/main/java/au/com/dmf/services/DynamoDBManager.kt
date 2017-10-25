@@ -268,21 +268,17 @@ object DynamoDBManager {
     }
 
     fun getNotifications(limit: Int, success: (ArrayList<DMFNotificationTableRow>) -> Unit, failure: () -> Unit) {
-        val scanExpression = DynamoDBScanExpression()
-        scanExpression.limit = limit
-        doAsync {
-            try {
-                val result = mapper.scanPage(DMFNotificationTableRow::class.java, scanExpression).results
-                val resultList = ArrayList<DMFNotificationTableRow>()
-                result.forEach { row -> resultList.add(row) }
+        val row = DMFNotificationTableRow()
+        row.NotificationStatus = "OK"
+        val queryExpression = DynamoDBQueryExpression<DMFNotificationTableRow>()
+                .withHashKeyValues(row)
+                .withScanIndexForward(false)
+                .withLimit(limit)
 
-                uiThread {
-                    success(resultList)
-                }
-            } catch (ex: AmazonServiceException) {
-                uiThread {
-                    failure()
-                }
+        doAsync {
+            val result = mapper.queryPage(DMFNotificationTableRow::class.java, queryExpression)
+            uiThread {
+                success(ArrayList(result.results))
             }
         }
     }
@@ -379,10 +375,12 @@ object DynamoDBManager {
 
     @DynamoDBTable(tableName = Constants.DMFNOTIFICATIONTableName)
     class DMFNotificationTableRow {
-        @get:DynamoDBHashKey(attributeName = "CreatedAt")
+        @get:DynamoDBRangeKey(attributeName = "CreatedAt")
         var CreatedAt: Long? = -1
         @get:DynamoDBAttribute(attributeName = "Message")
         var Message: String? = ""
+        @get:DynamoDBHashKey(attributeName = "NotificationStatus")
+        var NotificationStatus: String? = ""
     }
 
     @DynamoDBTable(tableName = Constants.DMFSUBSCRIPTIONTableName)

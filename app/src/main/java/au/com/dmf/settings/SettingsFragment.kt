@@ -142,6 +142,16 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             openSignOutSessionDialog(user!!.sessionDuration)
         })
 
+        val contactButton = view.findViewById<Button>(R.id.contactButton)
+        contactButton.setOnClickListener {
+            val transaction = activity.supportFragmentManager.beginTransaction()
+            val fragment = ContactFragment.newInstance("", "")
+            transaction.add(R.id.content, fragment)
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            transaction.addToBackStack("ContactFragment")
+            transaction.commit()
+        }
+
         return view
     }
 

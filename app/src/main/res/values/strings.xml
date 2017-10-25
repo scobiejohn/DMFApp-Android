@@ -38,4 +38,7 @@
     <string name="redeem_text">By selecting OK you are requesting to transfer funds from your nominated account to be processed on the next business day.\nThe minimum transfer amount is $1000</string>
     <string name="transfer_text">By selecting OK you are requesting to transfer funds from your nominated account to be processed on the next business day.\nThe minimum transfer amount is $1000</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
