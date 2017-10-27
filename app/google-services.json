@@ -1,35 +1,27 @@
 {
   "project_info": {
-    "project_number": "676250886189",
-    "firebase_url": "https://dmf-android-a2e63.firebaseio.com",
-    "project_id": "dmf-android-a2e63",
-    "storage_bucket": "dmf-android-a2e63.appspot.com"
+    "project_number": "599905413672",
+    "firebase_url": "https://dmf-android-5a237.firebaseio.com",
+    "project_id": "dmf-android-5a237",
+    "storage_bucket": "dmf-android-5a237.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:676250886189:android:58d1262e0825e3c9",
+        "mobilesdk_app_id": "1:599905413672:android:58d1262e0825e3c9",
         "android_client_info": {
           "package_name": "au.com.dmf"
         }
       },
       "oauth_client": [
         {
-          "client_id": "676250886189-c7mu7h6fjvia46fqu0fl35017ni7qq0q.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "au.com.dmf",
-            "certificate_hash": "05c00083f6c91222de90ed0898fe9f9e7b5a9078"
-          }
-        },
-        {
-          "client_id": "676250886189-lt0aefgtctemlkaemtk9g9g7ud4q41if.apps.googleusercontent.com",
+          "client_id": "599905413672-3c32h0b13gg2o77b02ha8bpserct7h8t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyASm_LTI5wtHXHhufWDW7sam-QXmZE2TzA"
+          "current_key": "AIzaSyC1s8fECU7GgAMvolLytOq3IlTwDuxM0wQ"
         }
       ],
       "services": {
@@ -37,13 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "676250886189-lt0aefgtctemlkaemtk9g9g7ud4q41if.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

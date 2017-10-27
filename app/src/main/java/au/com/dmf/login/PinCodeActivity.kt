@@ -9,9 +9,11 @@ import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.TextView
 import au.com.dmf.R
+import au.com.dmf.model.User
 import com.andrognito.pinlockview.IndicatorDots
 import com.andrognito.pinlockview.PinLockListener
 import com.andrognito.pinlockview.PinLockView
+import com.vicpin.krealmextensions.queryFirst
 
 class PinCodeActivity : AppCompatActivity() {
 
@@ -20,6 +22,8 @@ class PinCodeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pin_code)
+
+        val user = User().queryFirst()
 
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         window.setBackgroundDrawable(null)
@@ -32,7 +36,7 @@ class PinCodeActivity : AppCompatActivity() {
         pinCodeView.setPinLockListener(object : PinLockListener {
             override fun onComplete(pin: String?) {
                 println(pin)
-                if (pin == "1234") {
+                if (pin == user!!.pin.toString()) {
                     val intent = Intent()
                     intent.putExtra("PIN", "YES")
                     setResult(Activity.RESULT_OK, intent)

@@ -22,4 +22,7 @@
 
     <color name="black_overlay">#66000000</color>
 
+    <color name="enabled_gray">#00D3D3D3</color>
+    <color name="disabled_gray">#99D3D3D3</color>
+
 </resources>

@@ -27,6 +27,9 @@ import android.support.v4.content.ContextCompat
 import au.com.dmf.data.FundInfo
 import au.com.dmf.data.FundsDetail
 import au.com.dmf.events.GetFundStateEvent
+import au.com.dmf.utils.Util
+import au.com.dmf.utils.afterTextChanged
+import au.com.dmf.utils.hideSoftKeyBoard
 import com.afollestad.materialdialogs.DialogAction
 import org.jetbrains.anko.support.v4.find
 import org.jetbrains.anko.toast
@@ -48,6 +51,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     private lateinit var checkBox: CheckBox
     private lateinit var pinET: EditText
+    private lateinit var savePinButton: Button
     private lateinit var signOutSessionTV: TextView
 
     private val autoSignOutOptions: ArrayList<String> =  ArrayList()
@@ -119,11 +123,28 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
         checkBox = view.findViewById(R.id.pin_check_box)
         pinET = view.findViewById(R.id.pin_code)
+        savePinButton = view.findViewById(R.id.save_pin_button)
         checkBox.setOnCheckedChangeListener{_, isChecked ->
             pinET.visibility = if(isChecked) View.VISIBLE else View.GONE
+            savePinButton.visibility = if(isChecked) View.VISIBLE else View.GONE
             if (pinET.visibility == View.GONE) {
                 pinET.setText("")
             }
+        }
+        pinET.afterTextChanged {
+            savePinButton.isEnabled = it.length >= 4
+        }
+        savePinButton.setOnClickListener {
+            //update pin
+            val user = User().queryFirst()
+            if (checkBox.isChecked && pinET.text.length == 4) {
+                user!!.pin = pinET.text.toString().toInt()
+                user!!.save()
+            }
+
+            try {
+                hideSoftKeyBoard(activity)
+            }catch (err: Exception){}
         }
 
         val user = User().queryFirst()
@@ -224,19 +245,6 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
     override fun onDetach() {
         super.onDetach()
-
-        //update pin
-        val user = User().queryFirst()
-        if (checkBox.isChecked && pinET.text.length == 4) {
-            with(user!!) {
-                User(name, password, pinET.text.toString().toInt(), email, fundFile, sessionDuration, historyDataTimestamp, assetDate).save()
-            }
-        } else {
-            with(user!!) {
-                User(name, password, 0, email, fundFile, sessionDuration, historyDataTimestamp, assetDate).save()
-            }
-        }
-
         mListener = null
     }
 

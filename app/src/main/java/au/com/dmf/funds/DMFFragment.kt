@@ -4,13 +4,9 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.DashPathEffect
-import android.graphics.Typeface
-import android.icu.util.CurrencyAmount
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +15,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 
 import au.com.dmf.R
-import au.com.dmf.R.id.edit_query
 import au.com.dmf.data.FragmentToActivity
 import au.com.dmf.login.PinCodeActivity
 import au.com.dmf.model.User
@@ -30,23 +25,16 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.afollestad.materialdialogs.DialogAction
 import com.vicpin.krealmextensions.queryFirst
-import org.w3c.dom.Text
-import au.com.dmf.R.id.passwordInput
 import au.com.dmf.data.FundsDataManager
 import au.com.dmf.data.FundsDetail
 import au.com.dmf.events.GetFundStateEvent
 import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.ChartXAxisValueFormatter
-import au.com.dmf.utils.ChartYAxisValueFormatter
 import au.com.dmf.utils.Util
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.ChartData
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.pawegio.kandroid.alert
 import kotlinx.android.synthetic.main.fragment_dmf.*
 import work.wanghao.rxbus2.RxBus
 import work.wanghao.rxbus2.Subscribe
@@ -424,8 +412,6 @@ class DMFFragment : Fragment() {
             dates.add(dateFormatShort.parse(o.HistoryDate!!))
         }
 
-        smallChart.axisLeft.setDrawLabels(false)
-        smallChart.axisRight.setDrawLabels(false)
         smallChart.description = null
         smallChart.legend.formToTextSpace = 2f
         smallChart.legend.xEntrySpace = 24f
@@ -448,7 +434,10 @@ class DMFFragment : Fragment() {
         xAxis.setAvoidFirstLastClipping(true)
         xAxis.valueFormatter = ChartXAxisValueFormatter(dates)
 
-        smallChart.animateX(1500)
+        smallChart.axisLeft.isEnabled = false
+        smallChart.axisRight.isEnabled = false
+
+        smallChart.invalidate()
     }
 
     private fun getHistoryDataEntries(): ArrayList<Entry> {
@@ -479,13 +468,10 @@ class DMFFragment : Fragment() {
 
     private fun setData() {
         val dataSetL: LineDataSet
-        val dataSetR: LineDataSet
 
         if (smallChart.data != null && smallChart.data.dataSetCount > 0) {
             dataSetL = smallChart.data.getDataSetByIndex(0) as LineDataSet
-            dataSetR = smallChart.data.getDataSetByIndex(1) as LineDataSet
             dataSetL.values = getHistoryDataEntries()
-            dataSetR.values = getFeeDataEntries()
             smallChart.data.notifyDataChanged()
             smallChart.notifyDataSetChanged()
         } else {
@@ -496,15 +482,7 @@ class DMFFragment : Fragment() {
             dataSetL.lineWidth = 1.0f
             dataSetL.setDrawCircles(false)
 
-            dataSetR = LineDataSet(getFeeDataEntries(), "Fees")
-            dataSetR.axisDependency = YAxis.AxisDependency.RIGHT
-            dataSetR.color = ContextCompat.getColor(activity.applicationContext, R.color.colorAccent)
-            dataSetR.enableDashedLine(10f, 5f, 0f)
-            dataSetR.enableDashedHighlightLine(10f, 5f, 0f)
-            dataSetR.lineWidth = 1.0f
-            dataSetR.setDrawCircles(false)
-
-            val lineData = LineData(dataSetL, dataSetR)
+            val lineData = LineData(dataSetL)
             lineData.setDrawValues(false)
 
             //set data

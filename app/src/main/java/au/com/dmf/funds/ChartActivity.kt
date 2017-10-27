@@ -11,7 +11,6 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.android.synthetic.main.activity_chart.*
 import android.graphics.PorterDuff
-import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.view.MenuItem
 import au.com.dmf.data.FundsDataManager
@@ -110,8 +109,6 @@ class ChartActivity : AppCompatActivity() {
         largeChart.xAxis.setLabelCount(minOf(dates.size, 16), true)
         largeChart.xAxis.setAvoidFirstLastClipping(true)
 
-        largeChart.animateX(2000)
-
         //get the legend (only possible after setting data)
         val legend = largeChart.legend
         legend.form = Legend.LegendForm.SQUARE
@@ -126,8 +123,6 @@ class ChartActivity : AppCompatActivity() {
         xAxis.textSize = 11f
         xAxis.textColor = Color.DKGRAY
         xAxis.valueFormatter = ChartXAxisValueFormatter(dates)
-        //xAxis.setDrawGridLines(false)
-        //xAxis.setDrawAxisLine(false)
 
         val leftAxis = largeChart.axisLeft
         leftAxis.textSize = 11f
@@ -138,14 +133,7 @@ class ChartActivity : AppCompatActivity() {
         leftAxis.isGranularityEnabled = true
         leftAxis.valueFormatter = ChartYAxisValueFormatter()
 
-        val rightAxis = largeChart.axisRight
-        rightAxis.textSize = 11f
-        rightAxis.textColor = ContextCompat.getColor(this.applicationContext, R.color.colorAccent)
-        rightAxis.mAxisMaximum = getRightAxisMax()
-        rightAxis.mAxisMinimum = getRightAxisMin()
-        rightAxis.setDrawGridLines(true)
-        rightAxis.isGranularityEnabled = false
-        rightAxis.valueFormatter = ChartYAxisValueFormatter()
+        largeChart.axisRight.isEnabled = false
     }
 
     private fun getHistoryDataEntries(): ArrayList<Entry> {
@@ -253,13 +241,10 @@ class ChartActivity : AppCompatActivity() {
 
     private fun setData() {
         val dataSetL: LineDataSet
-        val dataSetR: LineDataSet
 
         if (largeChart.data != null && largeChart.data.dataSetCount > 0) {
             dataSetL = largeChart.data.getDataSetByIndex(0) as LineDataSet
-            dataSetR = largeChart.data.getDataSetByIndex(1) as LineDataSet
             dataSetL.values = getHistoryDataEntries()
-            dataSetR.values = getFeeDataEntries()
             largeChart.data.notifyDataChanged()
             largeChart.notifyDataSetChanged()
         } else {
@@ -270,15 +255,7 @@ class ChartActivity : AppCompatActivity() {
             dataSetL.lineWidth = 2.0f
             dataSetL.setDrawCircles(false)
 
-            dataSetR = LineDataSet(getFeeDataEntries(), "Fees")
-            dataSetR.axisDependency = YAxis.AxisDependency.RIGHT
-            dataSetR.color = ContextCompat.getColor(this.applicationContext, R.color.colorAccent)
-            dataSetR.enableDashedLine(8f, 5f, 0f)
-            dataSetR.enableDashedHighlightLine(10f, 5f, 0f)
-            dataSetR.lineWidth = 2.0f
-            dataSetR.setDrawCircles(false)
-
-            val lineData = LineData(dataSetL, dataSetR)
+            val lineData = LineData(dataSetL)
             lineData.setDrawValues(false)
 
             //set data
