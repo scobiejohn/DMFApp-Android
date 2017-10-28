@@ -108,7 +108,6 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             DynamoDBManager.getFundDetails("Darling Macro Fund", {row ->
                 val fundInfo = FundInfo(row.InMarket!!, row.Investable!!)
                 FundsDetail.funds.put("Darling Macro Fund", fundInfo)
-                FundsDetail.fundUpdated = true
                 activity.toast("The latest data has been checked.")
             }, {})
         }
@@ -129,6 +128,10 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             savePinButton.visibility = if(isChecked) View.VISIBLE else View.GONE
             if (pinET.visibility == View.GONE) {
                 pinET.setText("")
+
+                val user = User().queryFirst()
+                user!!.pin = 0
+                user!!.save()
             }
         }
         pinET.afterTextChanged {
@@ -218,9 +221,8 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         }
 
         val user = User().queryFirst()
-        with(user!!) {
-            User(name, password, pin, email, fundFile, updatedSessionDuration, historyDataTimestamp, assetDate).save()
-        }
+        user!!.sessionDuration = updatedSessionDuration
+        user!!.save()
 
         signOutSessionTV.text = autoSignOutSessionValueToLabel(updatedSessionDuration)
     }

@@ -234,10 +234,7 @@ class DMFFragment : Fragment() {
 
         checkHistoryFile()
 
-        if (FundsDetail.fundUpdated) {
-            FundsDetail.fundUpdated = false
-            updateFundModeDisplay()
-        }
+        updateFundModeDisplay()
 
         return view
     }

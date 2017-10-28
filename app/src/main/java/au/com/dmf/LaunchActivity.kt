@@ -1,13 +1,10 @@
 package au.com.dmf
 
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Html
 import au.com.dmf.login.LoginActivity
-import au.com.dmf.login.PinCodeActivity
-import au.com.dmf.model.User
-import au.com.dmf.services.DynamoDBManager
 import au.com.dmf.utils.AWSManager
 import au.com.dmf.utils.Constants
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
@@ -18,9 +15,9 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
-import com.vicpin.krealmextensions.queryFirst
-import com.vicpin.krealmextensions.save
 import java.lang.Exception
+import android.net.ConnectivityManager
+import android.widget.Toast
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -28,15 +25,18 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
+        if (!isNetworkAvailable()) {
+            Toast.makeText(this@LaunchActivity, "Please make sure that your Android phone has network connectivity.",
+                    Toast.LENGTH_LONG).show()
+
+            return
+        }
+
         AWSManager.init(applicationContext)
         val user = AWSManager.userPool?.currentUser
         val userName = user?.userId
 
         if (userName != null)  {
-
-            //FIXME: test
-//            enterApp("", "")
-//            return
 
             user.getSessionInBackground(object: AuthenticationHandler{
                 override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
@@ -99,4 +99,11 @@ class LaunchActivity : AppCompatActivity() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
 }
