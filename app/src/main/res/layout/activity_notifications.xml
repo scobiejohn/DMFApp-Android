@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
     android:orientation="vertical"
-    tools:context="au.com.dmf.notifications.NotificationsActivity">
+    tools:context="au.com.brightcapital.notifications.NotificationsActivity">
 
     <TextView
         android:textColor="@color/colorGrey"

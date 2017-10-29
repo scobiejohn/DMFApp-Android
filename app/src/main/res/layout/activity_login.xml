@@ -5,7 +5,7 @@
     android:id="@+id/errorMessage"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="au.com.dmf.login.LoginActivity">
+    tools:context="au.com.brightcapital.login.LoginActivity">
 
     <LinearLayout
         android:id="@+id/signInPanel"

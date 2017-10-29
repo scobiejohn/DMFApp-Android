@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
-    tools:context="au.com.dmf.login.PinCodeActivity">
+    tools:context="au.com.brightcapital.login.PinCodeActivity">
 
     <TextView
         android:id="@+id/pin_code_title"

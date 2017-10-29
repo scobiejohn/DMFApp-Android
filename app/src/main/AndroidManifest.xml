@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="au.com.dmf">
+    package="au.com.brightcapital">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name=".DMFApplication"
+        android:name="au.com.brightcapital.DMFApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -22,39 +22,39 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" />
+        <activity android:name="au.com.brightcapital.MainActivity" />
         <activity
-            android:name=".login.LoginActivity"
+            android:name="au.com.brightcapital.login.LoginActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".login.NewPasswordActivity"
+            android:name="au.com.brightcapital.login.NewPasswordActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_new_password"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".login.ForgotPasswordActivity"
+            android:name="au.com.brightcapital.login.ForgotPasswordActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".notifications.NotificationsActivity"
+            android:name="au.com.brightcapital.notifications.NotificationsActivity"
             android:configChanges="orientation"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:theme="@style/NoTitleDialog" />
-        <activity android:name=".InvitePeople.InvitePeopleActivity" />
+        <activity android:name="au.com.brightcapital.InvitePeople.InvitePeopleActivity" />
         <activity
-            android:name=".funds.ChartActivity"
+            android:name="au.com.brightcapital.funds.ChartActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_chart"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".LaunchActivity"
+            android:name="au.com.brightcapital.LaunchActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait"
@@ -66,19 +66,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".login.PinCodeActivity"
+            android:name="au.com.brightcapital.login.PinCodeActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/NoTitleDialog" />
 
-        <service android:name=".android_service.DMFFirebaseInstanceIdService">
+        <service android:name="au.com.brightcapital.android_service.DMFFirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name=".android_service.DMFFirebaseMessagingService"
+            android:name="au.com.brightcapital.android_service.DMFFirebaseMessagingService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context="au.com.dmf.funds.ChartActivity">
+    tools:context="au.com.brightcapital.funds.ChartActivity">
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/largeChart"

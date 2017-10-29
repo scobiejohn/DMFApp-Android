@@ -36,6 +36,50 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599905413672:android:b86ba18c4b05aee2",
+        "android_client_info": {
+          "package_name": "au.com.brightcapital"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599905413672-e9t985p6prvocvmglh4pdk84h45q5d8p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.brightcapital",
+            "certificate_hash": "05c00083f6c91222de90ed0898fe9f9e7b5a9078"
+          }
+        },
+        {
+          "client_id": "599905413672-3c32h0b13gg2o77b02ha8bpserct7h8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1s8fECU7GgAMvolLytOq3IlTwDuxM0wQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599905413672-3c32h0b13gg2o77b02ha8bpserct7h8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

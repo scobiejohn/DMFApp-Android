@@ -7,11 +7,11 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "au.com.dmf"
+        applicationId "au.com.brightcapital"
         minSdkVersion 22
         targetSdkVersion 26
         multiDexEnabled true
-        versionCode 101
+        versionCode 103
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
