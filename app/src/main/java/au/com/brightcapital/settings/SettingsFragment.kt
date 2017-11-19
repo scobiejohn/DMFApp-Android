@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import android.graphics.Color
 import au.com.brightcapital.data.FundInfo
 import au.com.brightcapital.data.FundsDetail
+import au.com.brightcapital.utils.Constants
 import au.com.brightcapital.utils.afterTextChanged
 import au.com.brightcapital.utils.hideSoftKeyBoard
 import org.jetbrains.anko.toast
@@ -46,8 +47,10 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
     private lateinit var pinET: EditText
     private lateinit var savePinButton: Button
     private lateinit var signOutSessionTV: TextView
+    private lateinit var reportingPeriodTV: TextView
 
     private val autoSignOutOptions: ArrayList<String> =  ArrayList()
+    private val reportingPeriodOptions: ArrayList<String> = ArrayList()
 
     // TODO: Rename and change types of parameters
     private var mParam1: String? = null
@@ -69,6 +72,9 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
 
         val options = arrayOf("Never", "After 5 Mins", "After 15 Mins", "After 30 Mins", "After 60 Mins")
         autoSignOutOptions.addAll(options)
+        val periodOptions = arrayOf(Constants.ReportingOneMonth, Constants.ReportingThreeMonths, Constants.ReportingJuneToDate, Constants.ReportingYearToDate,
+                Constants.ReportingTwelveMonths, Constants.ReportingThirtySixMonths, Constants.ReportingSixtyMonths, Constants.ReportingHundredTwentyMonths)
+        reportingPeriodOptions.addAll(periodOptions)
     }
 
     private val onOpenDocView = View.OnClickListener { view ->
@@ -113,7 +119,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             activity.startActivity(intent)
         })
 
-        checkBox = view.findViewById(R.id.pin_check_box)
+        checkBox = view.findViewById<CheckBox>(R.id.pin_check_box)
         pinET = view.findViewById(R.id.pin_code)
         savePinButton = view.findViewById(R.id.save_pin_button)
         checkBox.setOnCheckedChangeListener{_, isChecked ->
@@ -159,6 +165,13 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             openSignOutSessionDialog(user!!.sessionDuration)
         })
 
+        val reportingPeriodButton = view.findViewById<Button>(R.id.price_date_period_button)
+        reportingPeriodTV = view.findViewById<TextView>(R.id.price_data_period_label)
+        reportingPeriodTV.text = user!!.reportingPeriod
+        reportingPeriodButton.setOnClickListener({
+            openReportingPeriodDialog(user!!.reportingPeriod)
+        })
+
         val contactButton = view.findViewById<Button>(R.id.contactButton)
         contactButton.setOnClickListener {
             val transaction = activity.supportFragmentManager.beginTransaction()
@@ -170,6 +183,52 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         }
 
         return view
+    }
+
+    private fun openReportingPeriodDialog(reportingPeriod: String) {
+        val selectedIndex = when(reportingPeriod) {
+            Constants.ReportingOneMonth -> 0
+            Constants.ReportingThreeMonths -> 1
+            Constants.ReportingJuneToDate -> 2
+            Constants.ReportingYearToDate -> 3
+            Constants.ReportingTwelveMonths -> 4
+            Constants.ReportingThirtySixMonths -> 5
+            Constants.ReportingSixtyMonths -> 7
+            else -> 8
+        }
+
+        MaterialDialog.Builder(activity)
+                .title("Choose Reporting Period")
+                .items(reportingPeriodOptions)
+                .itemsCallbackSingleChoice(selectedIndex, MaterialDialog.ListCallbackSingleChoice { dialog, view, which, text ->
+                    updateUserReportingPeriod(which)
+                    true
+                })
+                .negativeText("Cancel")
+                //.negativeColor(ContextCompat.getColor(activity.applicationContext, R.color.dark_grey_color))
+                .negativeColor(Color.GRAY)
+                .positiveText("Choose")
+                .cancelable(false)
+                .show()
+    }
+
+    private fun updateUserReportingPeriod(periodIndex: Int) {
+        val selectedReportingPeriod = when(periodIndex) {
+            0 -> Constants.ReportingOneMonth
+            1 -> Constants.ReportingThreeMonths
+            2 -> Constants.ReportingJuneToDate
+            3 -> Constants.ReportingYearToDate
+            4 -> Constants.ReportingTwelveMonths
+            5 -> Constants.ReportingThreeMonths
+            6 -> Constants.ReportingSixtyMonths
+            else -> Constants.ReportingHundredTwentyMonths
+        }
+        val user = User().queryFirst()
+        if (user?.reportingPeriod != selectedReportingPeriod) {
+            user?.reportingPeriod = selectedReportingPeriod
+            user?.save()
+            reportingPeriodTV.text = selectedReportingPeriod
+        }
     }
 
     private fun openSignOutSessionDialog(sessionDuration: Int) {

@@ -293,7 +293,8 @@ class DMFFragment : Fragment() {
             return
         }
 
-        val seekBarChangeString = "Cash " + displayValueForExtreme(toProgress, true) + "%, Fund " + displayValueForExtreme(5 - toProgress, false) + "%."
+//        val seekBarChangeString = "Cash " + displayValueForExtreme(toProgress, true) + "%, Fund " + displayValueForExtreme(5 - toProgress, false) + "%."
+        val seekBarChangeString = "Earnings to Reinvest : " + displayValueForExtreme(5 - toProgress, false) + "%."
         val bodyContent = "Do you want to make a request for\n" + seekBarChangeString
         MaterialDialog.Builder(activity)
                 .title("Cash Allocation Change")
@@ -306,7 +307,8 @@ class DMFFragment : Fragment() {
                         seekBarProgress = fundSeekBar!!.progress
                         cashPercentageTx.text = displayValueForExtreme(seekBarProgress, true) + "%"
                         fundPercentageTx.text = displayValueForExtreme(5 - seekBarProgress, false) + "%"
-                        fundSeekBarTitleTx.text = "Funds In Cash : " + displayValueForExtreme(toProgress, true) + "%\nFunds In DMF : " + displayValueForExtreme(5 - toProgress, false) + "%"
+                        //fundSeekBarTitleTx.text = "Funds In Cash : " + displayValueForExtreme(toProgress, true) + "%\nFunds In DMF : " + displayValueForExtreme(5 - toProgress, false) + "%"
+                        fundSeekBarTitleTx.text = "Earnings to Reinvest : " + displayValueForExtreme(5 - toProgress, false) + "%"
 
                         JiraServiceManager.createTicket("Cash Allocation Change", "Darling Macro Fund", null, seekBarChangeString, null, null, {}, {})
                     } else {
@@ -332,11 +334,7 @@ class DMFFragment : Fragment() {
                 displayValue = "0"
             }
         } else if (updatedValue == 100) {
-            if (forCash) {
-                displayValue = "100"
-            } else {
-                displayValue = "Max"
-            }
+            displayValue = "100"
         } else {
             displayValue = updatedValue.toString()
         }
@@ -524,49 +522,49 @@ class DMFFragment : Fragment() {
         val o = historyData.last()
         val latestDateString = o.HistoryDate
         val lastDate = dateFormatShort.parse(latestDateString)
-        dmfHeaderUpdateTx.text = "Last Update: " + dateFormatLong.format(lastDate)
+        dmfHeaderUpdateTx?.text = "Last Update: " + dateFormatLong.format(lastDate)
 
         if (o.Capital!!.toDouble() < 0.01) {
             strategyBtnTx.text = "Core"
             fundStrategy = "Core"
-            dmfHeaderStrategyTx.text = "Strategy: Core"
+            dmfHeaderStrategyTx?.text = "Strategy: Core"
         } else {
             val factor = o.Risk!!.toDouble() / o.Capital!!.toDouble()
             when {
                 factor >= 5.0 -> {
                     strategyBtnTx.text = "Aggressive"
                     fundStrategy = "Aggressive"
-                    dmfHeaderStrategyTx.text = "Strategy: Aggressive"
+                    dmfHeaderStrategyTx?.text = "Strategy: Aggressive"
                 }
                 factor > 1.5 -> {
                     strategyBtnTx.text = "Growth"
                     fundStrategy = "Growth"
-                    dmfHeaderStrategyTx.text = "Strategy: Growth"
+                    dmfHeaderStrategyTx?.text = "Strategy: Growth"
                 }
                 else -> {
                     strategyBtnTx.text = "Core"
                     fundStrategy = "Core"
-                    dmfHeaderStrategyTx.text = "Strategy: Core"
+                    dmfHeaderStrategyTx?.text = "Strategy: Core"
                 }
             }
         }
 
         val totalFundInvested = o.Capital!!.toDouble() * 1000000
         val totalFundInvestedValue = "AUD +$" + decimalFormat.format(totalFundInvested)
-        dmfTotalFundInvestedTx.text = totalFundInvestedValue
+        dmfTotalFundInvestedTx?.text = totalFundInvestedValue
         val gross = o.Gross!!.toDouble()
         val grossValue = "AUD +$" + decimalFormat.format(gross)
-        dmfGrossPerformanceTx.text = grossValue
+        dmfGrossPerformanceTx?.text = grossValue
         val grossInvest = totalFundInvested + gross
         val grossInvestValue = "AUD +$" + decimalFormat.format(grossInvest)
-        dmfGrossInvestValueTx.text = grossInvestValue
+        dmfGrossInvestValueTx?.text = grossInvestValue
 
         val fees = o.FeeT!!.toDouble()
         val feesValue = "AUD -$" + decimalFormat.format(fees)
         dmfFeeTx.text = feesValue
         val netInvest = grossInvest - fees
         val netInvestValue = "AUD +$" + decimalFormat.format(netInvest)
-        dmfNetInvestValueTx.text = netInvestValue
+        dmfNetInvestValueTx?.text = netInvestValue
 
         dmfHeaderInvestValueTx.text = "Net Investment Value: " + netInvestValue
         dmfMyHoldingsTx.text = "My Holdings = $" + decimalFormat.format(netInvest)
@@ -578,9 +576,10 @@ class DMFFragment : Fragment() {
         seekBarProgress = cashAccValue
         val cashLabel = displayValueForExtreme(cashAccValue, true) + "%"
         val fundLabel = displayValueForExtreme(fundValue, false) + "%"
-        cashPercentageTx.text = cashLabel
-        fundPercentageTx.text = fundLabel
-        fundSeekBarTitleTx.text = "Funds In Cash : $cashLabel\nFunds In DMF : $fundLabel"
+        cashPercentageTx?.text = cashLabel
+        fundPercentageTx?.text = fundLabel
+//        fundSeekBarTitleTx.text = "Funds In Cash : $cashLabel\nFunds In DMF : $fundLabel"
+        fundSeekBarTitleTx?.text = "Earnings to Reinvest : $fundLabel"
         fundSeekBar.progress = seekBarProgress
 
         checkAssetsFile()
@@ -639,19 +638,19 @@ class DMFFragment : Fragment() {
 
         if (assetsData.size > 0) {
             val cashValue = decimalFormat.format((cash / totalAudExposure) * 100) + "%"
-            dmfExpCashTx.text = cashValue
+            dmfExpCashTx?.text = cashValue
             val equityValue = decimalFormat.format((equity / totalAudExposure) * 100) + "%"
-            dmfExpEquityTx.text = equityValue
+            dmfExpEquityTx?.text = equityValue
             val bondValue = decimalFormat.format((bond / totalAudExposure) * 100) + "%"
-            dmfExpBondTx.text = bondValue
+            dmfExpBondTx?.text = bondValue
             val shortbondValue = decimalFormat.format((shortbond / totalAudExposure) * 100) + "%"
-            dmfExpShortBondTx.text = shortbondValue
+            dmfExpShortBondTx?.text = shortbondValue
             val fxValue = decimalFormat.format((fx / totalAudExposure) * 100) + "%"
-            dmfExpFxTx.text = fxValue
+            dmfExpFxTx?.text = fxValue
             val preciousValue = decimalFormat.format((precious / totalAudExposure) * 100) + "%"
-            dmfExpMetalTx.text = preciousValue
+            dmfExpMetalTx?.text = preciousValue
             val agriValue = decimalFormat.format((agri / totalAudExposure) * 100) + "%"
-            dmfExpAgriTx.text = agriValue
+            dmfExpAgriTx?.text = agriValue
         }
 
     }

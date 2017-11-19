@@ -26,6 +26,39 @@
                 android:backgroundTint="@color/colorWhite"
                 android:text="Refresh data"/>
 
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorVeryLightGrey"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true">
+
+                <Button
+                    android:id="@+id/price_date_period_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textStart"
+                    android:backgroundTint="@color/colorWhite"
+                    android:text="Reporting Period"/>
+                <TextView
+                    android:id="@+id/price_data_period_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="13dp"
+                    android:text="3 months"
+                    android:elevation="100dp"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/colorLightGrey" />
+
+            </RelativeLayout>
+
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

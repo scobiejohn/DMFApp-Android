@@ -336,7 +336,7 @@
                 android:id="@+id/fund_seek_bar_title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textAlignment="center"
-                android:text="Funds In Cash : Min%\nFunds In DMF : Max%"
+                android:text=""
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

@@ -11,5 +11,6 @@ open class User (
         open var fundFile: String = "",
         open var sessionDuration: Int = 0,
         open var historyDataTimestamp: Int = -1,
-        open var assetDate: String = "19700101"
+        open var assetDate: String = "19700101",
+        open var reportingPeriod: String = "3 Months"
 ) : RealmObject()

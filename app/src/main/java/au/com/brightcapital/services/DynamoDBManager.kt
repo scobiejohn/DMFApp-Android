@@ -225,7 +225,12 @@ object DynamoDBManager {
         doAsync {
             val result = mapper.queryPage(DDDMFUserDataHistoryFromS3TableRow::class.java, queryExpression)
             uiThread {
-                success(ArrayList(result.results.sortedWith(compareBy( { it.HistoryDate }))))
+                if (result.results.size == 0) {
+                    failure()
+                } else {
+                    success(ArrayList(result.results.sortedWith(compareBy( { it.HistoryDate }))))
+                }
+
             }
         }
     }
@@ -254,10 +259,13 @@ object DynamoDBManager {
             try {
                 val result = mapper.queryPage(DDDMFUserDataAssetFromS3TableRow::class.java, queryExpression)
                 uiThread {
-                    success(ArrayList(result.results))
+                    if (result.results.size == 0) {
+                        failure()
+                    } else {
+                        success(ArrayList(result.results))
+                    }
                 }
             } catch (ex: AmazonServiceException) {
-                println(ex)
                 uiThread {
                     failure()
                 }
