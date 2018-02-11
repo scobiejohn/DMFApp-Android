@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 
@@ -60,6 +61,7 @@ class DMFFragment : Fragment() {
     private var mParam1: String? = null
     private var mParam2: String? = null
 
+    private lateinit var viewShield: View
     private lateinit var smallChart: LineChart
     private lateinit var fundSeekBar: SeekBar
     private lateinit var fundSeekBarTitleTx: TextView
@@ -104,6 +106,7 @@ class DMFFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_dmf, container, false)
 
+        viewShield = view.findViewById(R.id.fund_view_shield)
         fundSeekBarTitleTx = view.findViewById(R.id.fund_seek_bar_title)
         cashPercentageTx = view.findViewById(R.id.cash_percentage)
         fundPercentageTx = view.findViewById(R.id.fund_percentage)
@@ -509,6 +512,7 @@ class DMFFragment : Fragment() {
             updateHistoryDataDisplay(historyData, true)
         }, {
             activity.alert("Oops", "Failed to load capital data.")
+            viewShield.visibility = View.VISIBLE
         })
     }
 
@@ -517,9 +521,9 @@ class DMFFragment : Fragment() {
             FundsDataManager.dmfHistoryData = historyData
         }
 
-        renderChart()
-
+        viewShield.visibility = View.GONE
         val o = historyData.last()
+
         val latestDateString = o.HistoryDate
         val lastDate = dateFormatShort.parse(latestDateString)
         dmfHeaderUpdateTx?.text = "Last Update: " + dateFormatLong.format(lastDate)
@@ -581,6 +585,8 @@ class DMFFragment : Fragment() {
 //        fundSeekBarTitleTx.text = "Funds In Cash : $cashLabel\nFunds In DMF : $fundLabel"
         fundSeekBarTitleTx?.text = "Earnings to Reinvest : $fundLabel"
         fundSeekBar.progress = seekBarProgress
+
+        renderChart()
 
         checkAssetsFile()
     }

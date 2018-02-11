@@ -452,5 +452,13 @@
         </LinearLayout>
     </ScrollView>
 
+    <View
+        android:visibility="gone"
+        android:id="@+id/fund_view_shield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:background="#66ffffff"
+        android:clickable="true" />
 
 </FrameLayout>

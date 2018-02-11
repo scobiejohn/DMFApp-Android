@@ -23,6 +23,7 @@ import com.vicpin.krealmextensions.save
 import kotlinx.android.synthetic.main.fragment_settings.*
 import android.graphics.Color
 import au.com.brightcapital.data.FundInfo
+import au.com.brightcapital.data.FundsDataManager
 import au.com.brightcapital.data.FundsDetail
 import au.com.brightcapital.utils.Constants
 import au.com.brightcapital.utils.afterTextChanged
@@ -198,7 +199,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
         }
 
         MaterialDialog.Builder(activity)
-                .title("Choose Reporting Period")
+                .title("Reporting Period")
                 .items(reportingPeriodOptions)
                 .itemsCallbackSingleChoice(selectedIndex, MaterialDialog.ListCallbackSingleChoice { dialog, view, which, text ->
                     updateUserReportingPeriod(which)
@@ -228,6 +229,7 @@ class SettingsFragment : Fragment(), HtmlFileFragment.OnFragmentInteractionListe
             user?.reportingPeriod = selectedReportingPeriod
             user?.save()
             reportingPeriodTV.text = selectedReportingPeriod
+            FundsDataManager.dmfHistoryData = ArrayList()
         }
     }
 

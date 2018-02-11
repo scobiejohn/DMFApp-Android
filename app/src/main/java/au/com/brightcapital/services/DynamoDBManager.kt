@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import au.com.brightcapital.model.User
 import au.com.brightcapital.utils.Constants
+import au.com.brightcapital.utils.Util
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
@@ -219,8 +220,18 @@ object DynamoDBManager {
 
         val row = DDDMFUserDataHistoryFromS3TableRow()
         row.UserFileName = userFileName
+
+        //determine data period
+        val period = user!!.reportingPeriod;
+        val startDate = Util.getUserDateSince(period)
+
+        val rangeKeyCondition = Condition()
+        rangeKeyCondition.withComparisonOperator(ComparisonOperator.GT)
+                .withAttributeValueList(AttributeValue().withS(startDate))
+
         val queryExpression = DynamoDBQueryExpression<DDDMFUserDataHistoryFromS3TableRow>()
                 .withHashKeyValues(row)
+                .withRangeKeyCondition("HistoryDate", rangeKeyCondition)
                 .withScanIndexForward(false)
         doAsync {
             val result = mapper.queryPage(DDDMFUserDataHistoryFromS3TableRow::class.java, queryExpression)
@@ -307,7 +318,7 @@ object DynamoDBManager {
     class DDDMFUserDataHistoryFromS3TableRow {
         @get:DynamoDBHashKey(attributeName = "UserFileName")
         var UserFileName: String? = ""
-        @get:DynamoDBAttribute(attributeName = "HistoryDate")
+        @get:DynamoDBRangeKey(attributeName = "HistoryDate")
         var HistoryDate: String? = ""
         @get:DynamoDBAttribute(attributeName = "Id")
         var Id: String? = ""

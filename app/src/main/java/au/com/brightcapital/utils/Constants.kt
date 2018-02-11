@@ -52,7 +52,7 @@ class Constants {
 
         const val ReportingOneMonth = "1 Month"
         const val ReportingThreeMonths = "3 Months"
-        const val ReportingJuneToDate = "June To Date"
+        const val ReportingJuneToDate = "FY To Date"
         const val ReportingYearToDate = "Year To Date"
         const val ReportingTwelveMonths = "12 Months"
         const val ReportingThirtySixMonths = "36 Months"
